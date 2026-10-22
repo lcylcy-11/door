@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko" data-theme="cute">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="귀여운 얼굴이 참는 한계를 넘으면, 위층 화면이 부서진다. SVG 2D 중문 소음 게임."><title>문 좀 살살 — 참는 얼굴</title><link rel="stylesheet" href="./style.css"></head>
+<body>
+<main class="app">
+  <header class="header"><a class="brand" href="#" aria-label="문 좀 살살"><span class="door-logo" aria-hidden="true"><i></i></span><span><strong>문 좀 살살</strong><small>SWEET / STRANGE · 2D</small></span></a><nav class="themes" aria-label="게임 분위기"><button data-theme="comic" aria-pressed="false"><span>✦</span>코믹한 밤</button><button data-theme="horror" aria-pressed="false"><span>◐</span>수상한 밤</button><button data-theme="cute" aria-pressed="true"><span>✿</span>포근한 밤</button></nav><span class="back-3d">THE PRESS EDITION</span></header>
+  <div class="edition"><div><span id="editionTag">COZY EDITION</span><h1 id="editionTitle">작은 소리에도, 귀가 쫑긋.</h1><p id="editionCopy">아랫집 친구의 포근한 밤을 지켜주세요.</p></div><div class="night-time">02<span>:</span>17<small>늦은 밤의 원룸</small></div></div>
+  <section class="game-shell" aria-label="상하로 나뉜 2D 게임 화면">
+    <div class="toolbar"><div class="mission"><span class="mission-dot"></span><span id="mission">화장실 조용히 다녀오기</span><span id="progress" class="progress">0 / 4</span></div><div class="tools"><button id="demo" title="소음에 얼굴이 변했다가 진정하는 과정을 보여줍니다">표정 변화 <span>↗</span></button><button id="burstDemo" title="압박부터 화면 파괴까지 자동으로 보여줍니다">폭발 연출 <span>↗</span></button><button id="sound" aria-label="소리 끄기" title="소리 끄기">소리 ON</button><button id="pause" aria-label="일시정지" title="일시정지">Ⅱ</button><button id="reset" aria-label="처음부터" title="처음부터">↻</button></div></div>
+    <div id="stage" class="stage"><svg id="game" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800" role="img" aria-label="위 화면은 1인칭 중문, 아래 화면은 소음에 눌리는 아랫집 얼굴입니다. 한계를 넘으면 얼굴이 공포스럽게 변하고 위 화면을 부숩니다."></svg>
+      <div id="intro" class="overlay intro"><div class="intro-card"><p id="introEyebrow" class="eyebrow">우리의 조용한 약속</p><h2 id="introTitle">살금살금,<br>다녀올게요.</h2><p id="introCopy">손잡이를 잡고 점선을 따라 움직여요.<br>서두르면 아랫집 친구가 깜짝 놀라요.</p><button id="start" class="primary">조용히 시작하기 <span>→</span></button><button id="startPractice" class="text-button">편하게 연습할래요</button><small>마우스로 손잡이를 누른 채 드래그</small></div></div>
+      <div id="result" class="overlay result" hidden><div class="intro-card"><p id="resultTag" class="eyebrow">오늘의 밤</p><h2 id="resultTitle"></h2><p id="resultCopy"></p><button id="again" class="primary">다시 해보기 <span>→</span></button><button id="keepPractice" class="text-button">계속 연습하기</button></div></div>
+      <div id="pauseLayer" class="overlay pause-layer" hidden><div class="intro-card"><p class="eyebrow">잠깐 숨 고르기</p><h2>밤은 기다려줘요.</h2><button id="resume" class="primary">이어서 하기 <span>→</span></button></div></div>
+    </div>
+    <div class="game-status"><span id="neighborStatus" aria-live="polite">아랫집은 아직 편안해요.</span><div class="step-dots" aria-label="문 조작 진행"><i></i><i></i><i></i><i></i></div><span id="doorStatus">손잡이를 잡고 천천히 움직여요.</span></div>
+  </section>
+  <footer><p><b>PLAY NOTE</b> 손잡이로 경로를 따라가요. 얼굴이 눌리기 시작하면 잠깐 멈춰요.</p><span>같은 규칙, 서로 다른 참는 얼굴.</span></footer>
+</main>
+<script src="./core.js"></script><script src="./paths.js"></script><script src="./svg-surface.js"></script><script src="./portrait.js"></script><script src="./art.js"></script><script src="./game.js"></script>
+</body></html>

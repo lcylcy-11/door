@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101e22"><meta name="description" content="잠든 원룸의 밤. 마우스로 중문을 조심히 여닫고 아랫집의 일상을 지켜주세요.">
+  <title>문 좀 살살 — 새벽의 중문</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><div><h1>문 좀 살살</h1><p>A VERY ORDINARY NIGHT</p></div></div>
+      <div class="night"><span class="moon" aria-hidden="true">◔</span><span>수요일 <b>오전 02:17</b></span></div>
+      <div class="tools"><button id="sound" aria-label="소리 끄기" title="소리 끄기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="sound-waves" d="M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14"/></svg><span>소리</span></button><button id="pause" aria-label="일시정지" title="일시정지"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 5v14M15 5v14"/></svg></button><button id="restart" aria-label="처음부터" title="처음부터"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg></button></div>
+    </header>
+
+    <section id="stage" class="stage" aria-label="위층 문 조작과 아랫집의 상황을 보여주는 게임">
+      <canvas id="world" aria-label="1인칭 원룸과 아랫집 거실의 3차원 장면"></canvas>
+      <div id="upstairs" class="upstairs">
+        <div class="floor-label"><span class="floor-number">302</span><span>우리 집 <i>1인칭</i></span></div>
+        <div class="objective"><span class="objective-eyebrow">오늘의 작은 미션</span><strong id="mission">화장실, 조용히 다녀오기</strong><div class="steps" aria-label="문 여닫기 진행"><span></span><span></span><span></span><span></span><small id="stepLabel">0 / 4</small></div></div>
+        <svg id="guide" class="guide" aria-label="손잡이의 이동 경로"><path id="guideShadow"/><path id="guideLine"/><circle id="guideEnd" r="4"/><circle id="gripRing" r="22"/><circle id="gripDot" r="4"/></svg>
+        <div id="gripTip" class="grip-tip">손잡이를 잡고, 길을 따라 천천히</div>
+        <div id="soundWord" class="sound-word" aria-live="polite"></div>
+        <div class="room-caption"><span class="live-dot"></span><span id="doorStatus">중문이 닫혀 있습니다</span></div>
+        <div class="mouse-hint"><svg viewBox="0 0 20 25" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="1" width="14" height="22" rx="7"/><path d="M10 2v8M3 10h14"/></svg><span>누른 채로 드래그</span></div>
+      </div>
+      <div class="floor-seam"><span>302호</span><div id="wave" class="wave" aria-hidden="true"></div><span id="noiseLabel">조용한 밤</span><span class="seam-floor">202호</span></div>
+      <div id="downstairs" class="downstairs">
+        <div class="floor-label"><span class="floor-number">202</span><span>아랫집 <i>어떤 밤을 보내고 있을까</i></span></div>
+        <div id="neighborState" class="neighbor-state"><span></span><b>TV 보는 중</b></div>
+        <div id="thought" class="thought" aria-live="polite">음…?</div>
+        <div id="lowerCaption" class="lower-caption">아랫집에서는 아직 TV를 보고 있습니다.</div>
+        <span class="floor-room-label living">거실</span><span class="floor-room-label entrance">현관</span>
+      </div>
+
+      <div id="intro" class="overlay intro">
+        <div class="intro-card"><p class="eyebrow">소음에 예민한 이웃과 사는 법</p><h2>새벽 두 시,<br>문 하나가 문제다.</h2><p class="intro-copy">화장실은 가야겠고, 아랫집은 깨어 있고.<br>손잡이를 조심히 움직여 조용한 밤을 지켜주세요.</p><button id="start" class="primary">조용히 시작하기 <span>↗</span></button><p class="intro-note">마우스 드래그로 조작 · 헤드폰을 쓰면 더 잘 들려요</p></div>
+        <div class="intro-number" aria-hidden="true">02:17</div>
+      </div>
+      <div id="result" class="overlay result" hidden><div class="result-card"><p id="resultEyebrow" class="eyebrow">오늘의 밤</p><h2 id="resultTitle">무사히 다녀왔습니다.</h2><p id="resultCopy"></p><button id="again" class="primary">한 번 더 해보기 <span>↗</span></button><button id="practice" class="secondary">끝없이 연습하기</button></div></div>
+      <div id="paused" class="overlay paused" hidden><div class="pause-card"><p class="eyebrow">잠깐, 숨 고르기</p><h2>밤은 기다려줍니다.</h2><button id="resume" class="primary">이어서 하기 <span>↗</span></button></div></div>
+      <div id="webglError" class="overlay" hidden><div class="result-card"><h2>3D 화면을 시작할 수 없어요.</h2><p>브라우저의 하드웨어 가속을 켠 뒤 다시 열어주세요.</p></div></div>
+    </section>
+    <footer class="footnote"><p><span class="hint-key">TIP</span>빠르게 움직이거나 길을 벗어나면 소음이 납니다. 잠깐 멈추면 아랫집도 진정해요.</p><span>조용한 밤을 위한 작은 게임</span></footer>
+  </main>
+  <script src="./three.min.js"></script><script src="./game.js"></script>
+</body>
+</html>
