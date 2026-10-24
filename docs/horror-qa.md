@@ -1,5 +1,35 @@
 # One-door prototype verification — 2026-10-25
 
+## Current H2 checkpoint — force resistance and sound
+
+User verdict on H1: fear and instant-slam tension FAIL; slow-opening tension positive. User explicitly selected force resistance. H1's instant-close rule is superseded; its older evidence below describes the earlier checkpoint only.
+
+| H2 check | Result | Evidence / limits |
+|---|---|---|
+| Updated rules + old regressions | PASS | 21 tests: 10 old-game tests, 10 current horror-rule tests, 1 PCM-envelope test |
+| Parse | PASS | 11 JS files including `sound.js` |
+| Nontrivial resistance | PASS | One jump/instant close blocked; sweep of 21 fixed force policies cannot win; max force loses through noise; low force opens gap |
+| Feasible two-encounter trace | PASS | Deterministic solver and actual IAB entry → mouse open/stop → UI arrow-key force changes → both two-push grips → success |
+| Real UI input fidelity | PASS | No model mutation/mock for browser claims. Mouse opens, stops and attempts instant closure; supported real keyboard events vary force. Full continuous held-mouse play is a separate UNVERIFIED item below |
+| Fast-close workaround | PASS | Native mouse rightward close attempt followed by release leads to hand loss, not instant win; `quick-close-loss.png` |
+| Excess-force loss | PASS | UI maximum force → distinct strain loss; `strain-loss.png` |
+| Pause and force reset | PASS | Actual Esc during grip → pause → resume; simulation tests assert force cleared and regrab grace |
+| Narrow layout | PASS | 390×844 viewport, real drag entry + UI force sequence clears first hand; no horizontal overflow |
+| Audio output path | PASS | Real game starts AudioContext/loops and event voices; browser error/warning log empty. Pure PCM test checks bounded impact/body/tail at 44.1/48kHz. This does not certify perceptual audio quality |
+| Image provenance | PASS | Four local raster prompts embedded; grip sprite genuine RGBA alpha; four-raster scan clean |
+| Independent finish review | PASS | Code + six final captures; no material issue after loss-tail and retreat-cue corrections; ship local prototype checkpoint |
+| Continuous physical mouse resistance, human fear/feel/audio mix | UNVERIFIED | Browser automation exposes discrete drags and keys, not a sustained mouse-down/move primitive. Full browser success used real arrow keys for force, not a continuous physical mouse trace. User replay required for feel and perceptual judgment |
+
+H2 captures are local ignored files under `.impeccable/review/h2/`: `first-grip.png`, `combined-grip.png`, `success.png`, `strain-loss.png`, `mobile-intro.png`, `mobile-grip.png`, `quick-close-loss.png`, `ready.png`.
+
+One detector pass produced 69 findings, predominantly sparse H1 DESIGN tokens and overridden H1 CSS declarations, plus 11px supporting text. Current interaction/readability was reviewed at rendered sizes. No whole-project style drift repair or second audit was added. `detector.json` retains the actual output.
+
+Corrections from review: let the 1.4s loss breath decay naturally behind the result screen, and change the automatic retreat cue so it does not imply further effort is required. Body-level motion suppression preserves essential door movement while removing decorative camera shake. User sensory acceptance is still separate.
+
+Local-only preview stays on port 5174. No push, deployment, new rooms, third threat or full-game expansion.
+
+## Historical H1 evidence
+
 Scope: H1, local first-person prototype at `/horror/`; baseline `dbc42f4`. User experience acceptance and release approval are separate from these checks.
 
 ## Evidence

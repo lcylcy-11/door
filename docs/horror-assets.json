@@ -19,6 +19,13 @@
       "source": "exec-a30e9224-e71d-44ec-bc66-37e8babfd58f.png",
       "transparent": true,
       "prompt": "Use case: stylized-concept. Asset type: transparent 2D sprite for a first-person psychological horror game. Isolated long unnaturally pale human right hand and a short forearm entering horizontally from the RIGHT side, reaching toward the LEFT. Back of hand visible three-quarter front view, four long bony fingers curling downward and to the left as if grasping a vertical door edge, thumb visible below, anatomically convincing five fingers, slight elongated uncanny proportions. Desaturated grey skin with cold greenish shadows and dirty muted nails, painterly realistic detailed style for dark apartment game, faint warm edge light. Wrist cropped at the far right edge, fingers fully inside frame, fingertips point left. Opaque pale skin with clear readable silhouette. Actual transparent background, no door, no wall, no text, no blood, no gore, no extra limbs, no effects, no cast shadow outside hand."
+    },
+    {
+      "file": "dist/horror/assets/hand-grip.png",
+      "source": "exec-013b1941-8d53-43be-b1b4-e4fef0d2ec75.png",
+      "transparent": true,
+      "prompt": "Use case: precise-object-edit. Asset type: alternate transparent hand sprite for a 2D first-person horror game. Reference image: preserve this SAME pale long-fingered hand, painterly realistic shading, dirty nails and cold greenish skin, but CHANGE THE POSE to GRIPPING the vertical edge of a sliding door. Forearm enters from the RIGHT edge, palm seen from back at a slight angle. Four bony fingers clustered vertically near the LEFT side, bent sharply at the middle joints and curled around an INVISIBLE vertical edge, fingertips hooking slightly toward the viewer. Thumb curls below. Taut knuckles and tendons indicate a heavy force pulling left. Keep wrist horizontal and cropped on the RIGHT edge. Fingers must look like they can grip a thin vertical door edge rather than an open outstretched claw. All five fingers anatomically coherent, no extra limbs. Sparse faint warm light on finger ridges, deep greenish shadows, no blood no gore. Isolated cutout, ACTUAL transparent alpha background, no door no edge no wall no aura no text. The sprite will be positioned with its leftmost fingers on an animated wood door edge and its right forearm hidden behind the opposite jamb. Avoid extremely wide transparent margins. Maintain the same framing and left-reaching orientation as reference, broad landscape aspect.",
+      "reference": "dist/horror/assets/hand.png"
     }
   ]
 }
