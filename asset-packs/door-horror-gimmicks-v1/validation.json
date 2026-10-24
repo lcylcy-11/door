@@ -1,0 +1,406 @@
+{
+  "file_validation": "PASS",
+  "images": [
+    {
+      "id": "front-lit",
+      "status": "PASS",
+      "size": [
+        1672,
+        941
+      ],
+      "has_alpha": false,
+      "opaque_bbox": [
+        0,
+        0,
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "eyes",
+      "status": "PASS",
+      "size": [
+        1774,
+        887
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        76,
+        158,
+        1708,
+        758
+      ]
+    },
+    {
+      "id": "slipper-wedge",
+      "status": "PASS",
+      "size": [
+        1774,
+        887
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        62,
+        167,
+        1723,
+        761
+      ]
+    },
+    {
+      "id": "latch-body",
+      "status": "PASS",
+      "size": [
+        1024,
+        1536
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        342,
+        87,
+        701,
+        1381
+      ]
+    },
+    {
+      "id": "latch-bolt",
+      "status": "PASS",
+      "size": [
+        1024,
+        1536
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        442,
+        51,
+        723,
+        1484
+      ]
+    },
+    {
+      "id": "switch-body",
+      "status": "PASS",
+      "size": [
+        1024,
+        1536
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        181,
+        126,
+        844,
+        1412
+      ]
+    },
+    {
+      "id": "switch-rocker",
+      "status": "PASS",
+      "size": [
+        1024,
+        1536
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        309,
+        265,
+        716,
+        1268
+      ]
+    },
+    {
+      "id": "rear-room",
+      "status": "PASS",
+      "size": [
+        1672,
+        941
+      ],
+      "has_alpha": false,
+      "opaque_bbox": [
+        0,
+        0,
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "rear-drawer-front",
+      "status": "PASS",
+      "size": [
+        2206,
+        713
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        64,
+        172,
+        2147,
+        541
+      ]
+    },
+    {
+      "id": "ref-apartment",
+      "status": "PASS",
+      "size": [
+        1672,
+        941
+      ],
+      "has_alpha": false,
+      "opaque_bbox": [
+        0,
+        0,
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "ref-door",
+      "status": "PASS",
+      "size": [
+        1034,
+        1521
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        225,
+        4,
+        810,
+        1513
+      ]
+    },
+    {
+      "id": "ref-hand",
+      "status": "PASS",
+      "size": [
+        1536,
+        1024
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        65,
+        123,
+        1536,
+        884
+      ]
+    },
+    {
+      "id": "ref-hand-grip",
+      "status": "PASS",
+      "size": [
+        1536,
+        1024
+      ],
+      "has_alpha": true,
+      "opaque_bbox": [
+        168,
+        42,
+        1526,
+        929
+      ]
+    }
+  ],
+  "audio": [
+    {
+      "id": "mask-elevator-loop",
+      "status": "PASS",
+      "duration_seconds": 10.0,
+      "peak_dbfs": -10.97,
+      "rms_dbfs": -24.15,
+      "seam_step": 0.0,
+      "loop": true
+    },
+    {
+      "id": "mask-traffic-pass",
+      "status": "PASS",
+      "duration_seconds": 8.0,
+      "peak_dbfs": -7.26,
+      "rms_dbfs": -24.39,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "latch-slide",
+      "status": "PASS",
+      "duration_seconds": 0.85,
+      "peak_dbfs": -9.01,
+      "rms_dbfs": -22.64,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "latch-click",
+      "status": "PASS",
+      "duration_seconds": 0.38,
+      "peak_dbfs": -6.14,
+      "rms_dbfs": -29.46,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "latch-rattle",
+      "status": "PASS",
+      "duration_seconds": 1.2,
+      "peak_dbfs": -6.57,
+      "rms_dbfs": -29.38,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "breath-near",
+      "status": "PASS",
+      "duration_seconds": 2.8,
+      "peak_dbfs": -11.29,
+      "rms_dbfs": -29.11,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "switch-click",
+      "status": "PASS",
+      "duration_seconds": 0.22,
+      "peak_dbfs": -7.73,
+      "rms_dbfs": -29.57,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "lamp-hum-loop",
+      "status": "PASS",
+      "duration_seconds": 6.0,
+      "peak_dbfs": -18.86,
+      "rms_dbfs": -25.84,
+      "seam_step": 0.0,
+      "loop": true
+    },
+    {
+      "id": "wedge-in",
+      "status": "PASS",
+      "duration_seconds": 0.9,
+      "peak_dbfs": -9.95,
+      "rms_dbfs": -23.32,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "wedge-slip",
+      "status": "PASS",
+      "duration_seconds": 1.35,
+      "peak_dbfs": -9.57,
+      "rms_dbfs": -23.84,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "wedge-out",
+      "status": "PASS",
+      "duration_seconds": 0.7,
+      "peak_dbfs": -11.88,
+      "rms_dbfs": -25.23,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "door-scrape",
+      "status": "PASS",
+      "duration_seconds": 1.3,
+      "peak_dbfs": -10.97,
+      "rms_dbfs": -24.05,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "mimic-response",
+      "status": "PASS",
+      "duration_seconds": 1.3,
+      "peak_dbfs": -8.92,
+      "rms_dbfs": -25.22,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "drawer-slide",
+      "status": "PASS",
+      "duration_seconds": 1.5,
+      "peak_dbfs": -8.32,
+      "rms_dbfs": -21.73,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "drawer-creak-loop",
+      "status": "PASS",
+      "duration_seconds": 3.0,
+      "peak_dbfs": -11.64,
+      "rms_dbfs": -23.57,
+      "seam_step": 0.0,
+      "loop": true
+    },
+    {
+      "id": "drawer-thud",
+      "status": "PASS",
+      "duration_seconds": 0.6,
+      "peak_dbfs": -5.48,
+      "rms_dbfs": -25.29,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "rear-floor-creak",
+      "status": "PASS",
+      "duration_seconds": 1.4,
+      "peak_dbfs": -9.24,
+      "rms_dbfs": -26.3,
+      "seam_step": 0.0,
+      "loop": false
+    },
+    {
+      "id": "knock-wood",
+      "status": "PASS",
+      "duration_seconds": 1.05,
+      "peak_dbfs": -4.69,
+      "rms_dbfs": -24.24,
+      "seam_step": 0.0,
+      "loop": false
+    }
+  ],
+  "gimmick_coverage": {
+    "G1": "PASS",
+    "G2": "PASS",
+    "G3": "PASS",
+    "G4": "PASS",
+    "G5": "PASS",
+    "G6": "PASS",
+    "G7": "PASS"
+  },
+  "lighting_jamb_measurement": [
+    {
+      "feature": "left-frame",
+      "dim_x": 475,
+      "lit_x": 475,
+      "shift_px": 0
+    },
+    {
+      "feature": "middle-frame",
+      "dim_x": 687,
+      "lit_x": 687,
+      "shift_px": 0
+    },
+    {
+      "feature": "right-frame",
+      "dim_x": 1256,
+      "lit_x": 1255,
+      "shift_px": -1
+    }
+  ],
+  "bedroom_mean_luma": {
+    "dim": 76.58,
+    "lit": 131.59
+  },
+  "warnings": [
+    "ref-hand: alpha fringe touches canvas; inspect visually"
+  ],
+  "failures": [],
+  "limits": [
+    "No gameplay implementation or runtime integration tested.",
+    "Audio perceptual quality and final user aesthetic acceptance UNVERIFIED.",
+    "Geometry fit outside the asset preview remains UNVERIFIED."
+  ]
+}

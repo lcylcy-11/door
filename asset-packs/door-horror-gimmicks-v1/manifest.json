@@ -1,0 +1,1001 @@
+{
+  "schema_version": 1,
+  "title": "문틈 — 일곱 기믹 Claude 인계 에셋 팩",
+  "date": "2026-10-25",
+  "scope": "ASSETS ONLY; no gameplay implementation or integration",
+  "baseline_commit": "ce24928",
+  "new_image_count": 9,
+  "reference_image_count": 4,
+  "audio_count": 18,
+  "world_reference": {
+    "viewbox": [
+      1600,
+      900
+    ],
+    "door_clip_xywh": [
+      700,
+      80,
+      488,
+      695
+    ],
+    "door_travel_x": 440,
+    "background_native_size": [
+      1672,
+      941
+    ]
+  },
+  "images": [
+    {
+      "id": "front-lit",
+      "file": "images/front-lit.png",
+      "label": "전면 방 — 조명 켜짐",
+      "gimmicks": [
+        "G4"
+      ],
+      "kind": "new",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "has_alpha": false,
+      "opaque_bbox_xyxy": [
+        0,
+        0,
+        1672,
+        941
+      ],
+      "alpha_extrema": null,
+      "sha256": "4ed74973b7cda26087b0063765c7142907879d9bd274982958d1fe6fbe1e27fb",
+      "source": "image-provenance.json#front-lit",
+      "opaque_center_px": [
+        836.0,
+        470.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "eyes",
+      "file": "images/eyes.png",
+      "label": "문틈의 눈",
+      "gimmicks": [
+        "G3"
+      ],
+      "kind": "new",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        76,
+        158,
+        1708,
+        758
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "d0a6f91823713d39dcd92e46f25b3d562ae3f83d6418ce5bfb97e56d37f42b5b",
+      "source": "image-provenance.json#eyes",
+      "opaque_center_px": [
+        892.0,
+        458.0
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "slipper-wedge",
+      "file": "images/slipper-wedge.png",
+      "label": "버팀목 슬리퍼",
+      "gimmicks": [
+        "G5"
+      ],
+      "kind": "new",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        62,
+        167,
+        1723,
+        761
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "bf7a86ccf30151cf3c678b6b5f03e1f06f85cec83850cc38f4ba867a192d8054",
+      "source": "image-provenance.json#slipper-wedge",
+      "opaque_center_px": [
+        892.5,
+        464.0
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "latch-body",
+      "file": "images/latch-body.png",
+      "label": "걸쇠 고정판",
+      "gimmicks": [
+        "G2"
+      ],
+      "kind": "new",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        342,
+        87,
+        701,
+        1381
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "7df34109eb0c50ae3fb07ece2bd02c2a3dc8c3c190a4575eb0ed0174baf00a00",
+      "source": "image-provenance.json#latch-body",
+      "opaque_center_px": [
+        521.5,
+        734.0
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "latch-bolt",
+      "file": "images/latch-bolt.png",
+      "label": "걸쇠 이동 봉",
+      "gimmicks": [
+        "G2"
+      ],
+      "kind": "new",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        442,
+        51,
+        723,
+        1484
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "2d095e5e42bc389d6749bb2d5ac8cb7d172d3f42449426d7e98159d4201f3c07",
+      "source": "image-provenance.json#latch-bolt",
+      "opaque_center_px": [
+        582.5,
+        767.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "switch-body",
+      "file": "images/switch-body.png",
+      "label": "스위치 고정판",
+      "gimmicks": [
+        "G4"
+      ],
+      "kind": "new",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        181,
+        126,
+        844,
+        1412
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "9a8d0af6f4d277d5f2f9918ea1fed20587977c1e81825afcb83f460a2de7ffec",
+      "source": "image-provenance.json#switch-body",
+      "opaque_center_px": [
+        512.5,
+        769.0
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "switch-rocker",
+      "file": "images/switch-rocker.png",
+      "label": "스위치 로커",
+      "gimmicks": [
+        "G4"
+      ],
+      "kind": "new",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        309,
+        265,
+        716,
+        1268
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "31793b725df640859acd98066e7c889effeec7043bdabdcf46dfb46d9e670569",
+      "source": "image-provenance.json#switch-rocker",
+      "opaque_center_px": [
+        512.5,
+        766.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "rear-room",
+      "file": "images/rear-room.png",
+      "label": "뒤돌아본 방 — 상단 서랍 빈 공간",
+      "gimmicks": [
+        "G7"
+      ],
+      "kind": "new",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "has_alpha": false,
+      "opaque_bbox_xyxy": [
+        0,
+        0,
+        1672,
+        941
+      ],
+      "alpha_extrema": null,
+      "sha256": "6425d5c5c1413f1bb28b3124885664508229fee133225997874f7265ab8ad5b2",
+      "source": "image-provenance.json#rear-room",
+      "opaque_center_px": [
+        836.0,
+        470.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "rear-drawer-front",
+      "file": "images/rear-drawer-front.png",
+      "label": "상단 서랍 앞판",
+      "gimmicks": [
+        "G7"
+      ],
+      "kind": "new",
+      "width": 2206,
+      "height": 713,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        64,
+        172,
+        2147,
+        541
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "836f87b7ffa96d93fb444605ee36454e78c79b2ee170eb846dda4c26df3ef437",
+      "source": "image-provenance.json#rear-drawer-front",
+      "opaque_center_px": [
+        1105.5,
+        356.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "ref-apartment",
+      "file": "references/apartment.png",
+      "label": "기존 H2 apartment",
+      "gimmicks": [],
+      "kind": "unchanged-reference",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "has_alpha": false,
+      "opaque_bbox_xyxy": [
+        0,
+        0,
+        1672,
+        941
+      ],
+      "alpha_extrema": null,
+      "sha256": "32fe8f46326e82ec057fdaa713951808bfb5fa208902ec3de8aa51cff95301a3",
+      "source": "references/original-provenance.json",
+      "opaque_center_px": [
+        836.0,
+        470.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "ref-door",
+      "file": "references/door.png",
+      "label": "기존 H2 door",
+      "gimmicks": [],
+      "kind": "unchanged-reference",
+      "width": 1034,
+      "height": 1521,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        225,
+        4,
+        810,
+        1513
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "53e3716e2a57b3aea1e6736143dd691c4d7b5e4d61ce24413deb39afd41047ad",
+      "source": "references/original-provenance.json",
+      "opaque_center_px": [
+        517.5,
+        758.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "ref-hand",
+      "file": "references/hand.png",
+      "label": "기존 H2 hand",
+      "gimmicks": [],
+      "kind": "unchanged-reference",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        65,
+        123,
+        1536,
+        884
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "ca42038fa5248f489aa74b383baa19e30659fcd473d14ba06e3a21ec7c74a02a",
+      "source": "references/original-provenance.json",
+      "opaque_center_px": [
+        800.5,
+        503.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    },
+    {
+      "id": "ref-hand-grip",
+      "file": "references/hand-grip.png",
+      "label": "기존 H2 hand-grip",
+      "gimmicks": [],
+      "kind": "unchanged-reference",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "opaque_bbox_xyxy": [
+        168,
+        42,
+        1526,
+        929
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "38bd4bcb12f62d0602eea57f935e90e3fa1f50e15e562fcf4f2a0900fbc79985",
+      "source": "references/original-provenance.json",
+      "opaque_center_px": [
+        847.0,
+        485.5
+      ],
+      "anchor_note": "Native-canvas pixels. Opaque bounds exclude transparent padding; preserve aspect ratio unless a verified fit needs adjustment."
+    }
+  ],
+  "audio": [
+    {
+      "id": "mask-elevator-loop",
+      "file": "audio/mask-elevator-loop.wav",
+      "gimmicks": [
+        "G1"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 480000,
+      "duration_seconds": 10.0,
+      "loop": true,
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 480000,
+      "peak_dbfs": -10.97,
+      "rms_dbfs": -24.15,
+      "suggested_initial_gain": 0.5,
+      "pan_baked": -0.25,
+      "use": "마스킹 구간의 승강기 모터. 루프 전체에 소음 차폐를 판정하지 말고 실제 재생 gain과 연결.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "1c6c67001f0d61c8cc041e4e455c0ef1541c07ad30f8cf11aa961a9aceff8d2d"
+    },
+    {
+      "id": "mask-traffic-pass",
+      "file": "audio/mask-traffic-pass.wav",
+      "gimmicks": [
+        "G1"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 384000,
+      "duration_seconds": 8.0,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -7.26,
+      "rms_dbfs": -24.39,
+      "suggested_initial_gain": 0.5,
+      "pan_baked": 0.1,
+      "use": "창밖 차량 통과 8초. 중심 구간이 가장 크다. 앞뒤 작은 소리 구간은 안전 마스킹으로 취급하지 않을 것.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "9bae56ed15cbe7d3309cdb085c3fe1870aac3c0ace1ccf52a279aa26dff03900"
+    },
+    {
+      "id": "latch-slide",
+      "file": "audio/latch-slide.wav",
+      "gimmicks": [
+        "G2"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 40800,
+      "duration_seconds": 0.85,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -9.01,
+      "rms_dbfs": -22.64,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0.12,
+      "use": "걸쇠를 천천히 내리는 마찰. 실제 이동 속도와 gain을 연결.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "dcfe8c9b398b7af0d2a5b5cd25f1d18952a08e49722bbcbc46b62a8e380e7be0"
+    },
+    {
+      "id": "latch-click",
+      "file": "audio/latch-click.wav",
+      "gimmicks": [
+        "G2"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 18240,
+      "duration_seconds": 0.38,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -6.14,
+      "rms_dbfs": -29.46,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0.12,
+      "use": "걸쇠가 홈에 들어간 완료 피드백. 한 번만 재생.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "d6694f939550e322e0db48cf7ccf633cb81052d1cb38708a66dc8d93ba64676d"
+    },
+    {
+      "id": "latch-rattle",
+      "file": "audio/latch-rattle.wav",
+      "gimmicks": [
+        "G2"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 57600,
+      "duration_seconds": 1.2,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -6.57,
+      "rms_dbfs": -29.38,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0.2,
+      "use": "걸쇠를 급하게/잘못 움직일 때의 금속 떨림. 실패 확정과는 분리.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "95c938983bb79c5b5cda0ad57853f3e2535996d13170accdde955ffb1f60a2ba"
+    },
+    {
+      "id": "breath-near",
+      "file": "audio/breath-near.wav",
+      "gimmicks": [
+        "G3"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 134400,
+      "duration_seconds": 2.8,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -11.29,
+      "rms_dbfs": -29.11,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0.45,
+      "use": "눈/시선 위협의 가까운 합성 숨. 대사/배우 녹음이 아니며 시각 신호를 대체하지 않음.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "4aceed8dcfd26a5cdc07d42958563b5170a9e8b904d754f6589b48db79303cfb"
+    },
+    {
+      "id": "switch-click",
+      "file": "audio/switch-click.wav",
+      "gimmicks": [
+        "G4"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 10560,
+      "duration_seconds": 0.22,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -7.73,
+      "rms_dbfs": -29.57,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": -0.1,
+      "use": "벽 스위치 눌림. 켬/끔 공용, 같은 토글에서 중복 재생하지 않을 것.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "648e3c90011269303264ad48305a9a3ad2f07cc6df81e5f0090d46b86f91abbc"
+    },
+    {
+      "id": "lamp-hum-loop",
+      "file": "audio/lamp-hum-loop.wav",
+      "gimmicks": [
+        "G4"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 288000,
+      "duration_seconds": 6.0,
+      "loop": true,
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 288000,
+      "peak_dbfs": -18.86,
+      "rms_dbfs": -25.84,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": -0.1,
+      "use": "불이 켜진 동안의 작은 전원 험. 80ms 이상 gain fade 권장.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "b5e0b5c430af5e6537bca5890d0f68e8f5266cd307908d167554ffb239ca3f1a"
+    },
+    {
+      "id": "wedge-in",
+      "file": "audio/wedge-in.wav",
+      "gimmicks": [
+        "G5"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 43200,
+      "duration_seconds": 0.9,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -9.95,
+      "rms_dbfs": -23.32,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0,
+      "use": "슬리퍼를 문 밑으로 밀어 넣는 마찰과 접촉.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "d890c8226e17490b897e0546a769faaad5838558696668642f3acebed9927767"
+    },
+    {
+      "id": "wedge-slip",
+      "file": "audio/wedge-slip.wav",
+      "gimmicks": [
+        "G5"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 64800,
+      "duration_seconds": 1.35,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -9.57,
+      "rms_dbfs": -23.84,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0,
+      "use": "버팀목이 미끄러지는 경고. 끝의 음량이 커짐. 예고 없이 즉사 판정에 쓰지 않을 것.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "bc0fb020c481e44e1b23d8afc2cd6c06060ee5c4d0e609fc00ce333b6e28f1c2"
+    },
+    {
+      "id": "wedge-out",
+      "file": "audio/wedge-out.wav",
+      "gimmicks": [
+        "G5"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 33600,
+      "duration_seconds": 0.7,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -11.88,
+      "rms_dbfs": -25.23,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0,
+      "use": "슬리퍼를 빼는 마찰. 제거 완료 이벤트와 분리해 동작 중 재생.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "7aa357cd22eb49c170965320f052d556c804a705ea278e17cbb090ce8a9d942f"
+    },
+    {
+      "id": "door-scrape",
+      "file": "audio/door-scrape.wav",
+      "gimmicks": [
+        "G6"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 62400,
+      "duration_seconds": 1.3,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -10.97,
+      "rms_dbfs": -24.05,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0,
+      "use": "플레이어 쪽 문 마찰. 실제 문 이동 중만 재생하고 멈추면 감쇠.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "f7ad1019f75e2cc121de9ff5a0a8eaf2c0302b33bb4fbd912ab3a7a5ce25321b"
+    },
+    {
+      "id": "mimic-response",
+      "file": "audio/mimic-response.wav",
+      "gimmicks": [
+        "G6"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 62400,
+      "duration_seconds": 1.3,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -8.92,
+      "rms_dbfs": -25.22,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": 0.48,
+      "use": "문 너머의 유사한 응답 마찰. 런타임에서 플레이어 소리에 지연시켜 재생; 지연/정답 타이밍은 파일에 구워 넣지 않음.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "f425cf07dcb6daf5a5f988a946a0c7eaa5c42788c15aa04a9e79155a2281732e"
+    },
+    {
+      "id": "drawer-slide",
+      "file": "audio/drawer-slide.wav",
+      "gimmicks": [
+        "G7"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 72000,
+      "duration_seconds": 1.5,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -8.32,
+      "rms_dbfs": -21.73,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": -0.35,
+      "use": "서랍 이동 마찰. 바라보아 멈추면 짧게 감쇠시키기.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "55a1aa4446bcf11f6937f71e837b8d4c03adf3babbf6cdb2ea8e3f1e008af20a"
+    },
+    {
+      "id": "drawer-creak-loop",
+      "file": "audio/drawer-creak-loop.wav",
+      "gimmicks": [
+        "G7"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 144000,
+      "duration_seconds": 3.0,
+      "loop": true,
+      "loop_start_frame": 0,
+      "loop_end_frame_exclusive": 144000,
+      "peak_dbfs": -11.64,
+      "rms_dbfs": -23.57,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": -0.35,
+      "use": "서랍이 조금씩 열리는 지속 예고. 시선/진행 상태와 연결.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "f031948760296c8b535385020385e85a45ad3fe4a20e9d7f59fef486e7cd9b5c"
+    },
+    {
+      "id": "drawer-thud",
+      "file": "audio/drawer-thud.wav",
+      "gimmicks": [
+        "G7"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 28800,
+      "duration_seconds": 0.6,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -5.48,
+      "rms_dbfs": -25.29,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": -0.35,
+      "use": "서랍이 걸리거나 닫힐 때의 둔탁한 접촉.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "16e8a555e1dcf339923b853a77e7231a9f97ed11fab3d55ec3534f4853b39854"
+    },
+    {
+      "id": "rear-floor-creak",
+      "file": "audio/rear-floor-creak.wav",
+      "gimmicks": [
+        "G7"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 67200,
+      "duration_seconds": 1.4,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -9.24,
+      "rms_dbfs": -26.3,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": -0.45,
+      "use": "등 뒤 바닥의 체중 이동처럼 들리는 합성 삐걱임. 위치 예고용.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "8b3237252a5a78146f38fa649193f06f783829df2b2215fc5a45236fa5e6bf21"
+    },
+    {
+      "id": "knock-wood",
+      "file": "audio/knock-wood.wav",
+      "gimmicks": [
+        "G1",
+        "G2",
+        "G4",
+        "G7"
+      ],
+      "sample_rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 50400,
+      "duration_seconds": 1.05,
+      "loop": false,
+      "loop_start_frame": null,
+      "loop_end_frame_exclusive": null,
+      "peak_dbfs": -4.69,
+      "rms_dbfs": -24.24,
+      "suggested_initial_gain": 0.65,
+      "pan_baked": -0.2,
+      "use": "H2의 목재 공명 설계에 기반한 공용 단일 노크. 노크 리듬은 런타임에서 구성.",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording",
+      "sha256": "6f4df698d19a7d5f8639205fd5e9ca1328e7ac78c364ccc44b832f04a4f4b15c"
+    }
+  ],
+  "gimmicks": [
+    {
+      "id": "G1",
+      "title": "다른 소리에 숨어 움직이기",
+      "images": [
+        "ref-apartment",
+        "ref-door"
+      ],
+      "audio": [
+        "mask-elevator-loop",
+        "mask-traffic-pass",
+        "knock-wood"
+      ],
+      "response": "외부 소리가 문 소음을 충분히 가리는 동안 진행하고, 작아지면 멈춘다."
+    },
+    {
+      "id": "G2",
+      "title": "문을 닫은 뒤 걸쇠까지 잠그기",
+      "images": [
+        "latch-body",
+        "latch-bolt"
+      ],
+      "audio": [
+        "latch-slide",
+        "latch-click",
+        "latch-rattle"
+      ],
+      "response": "문을 닫은 후 손잡이를 놓고 걸쇠를 조심히 내린다. 걸쇠가 홈에 들어가야 완료."
+    },
+    {
+      "id": "G3",
+      "title": "문틈의 눈을 피하며 닫기",
+      "images": [
+        "eyes",
+        "ref-door"
+      ],
+      "audio": [
+        "breath-near"
+      ],
+      "response": "눈을 마주치지 않도록 아래로 보되, 손잡이는 식별하며 문을 닫는다."
+    },
+    {
+      "id": "G4",
+      "title": "불을 켜서 확인할지 선택하기",
+      "images": [
+        "front-lit",
+        "ref-apartment",
+        "switch-body",
+        "switch-rocker"
+      ],
+      "audio": [
+        "switch-click",
+        "lamp-hum-loop"
+      ],
+      "response": "불로 정보를 얻는 대신 소리와 빛으로 위치가 드러나는 위험을 감수한다."
+    },
+    {
+      "id": "G5",
+      "title": "임시 버팀목을 쓰고 다시 빼기",
+      "images": [
+        "slipper-wedge",
+        "ref-door"
+      ],
+      "audio": [
+        "wedge-in",
+        "wedge-slip",
+        "wedge-out"
+      ],
+      "response": "슬리퍼로 잠깐 문을 지탱하고 다른 행동을 한다. 완전히 닫기 전에 빼고 다시 잡는다."
+    },
+    {
+      "id": "G6",
+      "title": "내 움직임을 따라 하는 상대를 속이기",
+      "images": [
+        "ref-door",
+        "ref-hand",
+        "ref-hand-grip"
+      ],
+      "audio": [
+        "door-scrape",
+        "mimic-response"
+      ],
+      "response": "짧게 움직이고 멈춰 상대의 응답을 유도한 뒤 반대 방향으로 움직인다. 지연은 런타임 소유."
+    },
+    {
+      "id": "G7",
+      "title": "등 뒤를 확인하는 동안 문을 보지 못하기",
+      "images": [
+        "rear-room",
+        "rear-drawer-front"
+      ],
+      "audio": [
+        "drawer-slide",
+        "drawer-creak-loop",
+        "drawer-thud",
+        "rear-floor-creak"
+      ],
+      "response": "뒤쪽 서랍을 보면 움직임이 멎지만 그동안 문틈을 볼 수 없다."
+    }
+  ],
+  "assemblies": {
+    "latch": {
+      "space": "latch-body native canvas, pixels",
+      "body_xywh": [
+        0,
+        100,
+        1024,
+        1536
+      ],
+      "bolt_scale": 0.75,
+      "bolt_closed_xy": [
+        130,
+        290
+      ],
+      "bolt_open_xy": [
+        130,
+        60
+      ],
+      "foreground_occlusion_rects_xywh": [
+        [
+          440,
+          312,
+          160,
+          123
+        ],
+        [
+          435,
+          758,
+          168,
+          120
+        ],
+        [
+          436,
+          1185,
+          170,
+          255
+        ]
+      ],
+      "note": "Preview fit only. Rod must pass BEHIND guide collars and receiver; redraw clipped regions from the SAME body image above rod. Whole assembly includes top margin for unlocked tip. Runtime placement/logic not implemented."
+    },
+    "switch": {
+      "space": "switch-body native canvas, pixels",
+      "rocker_scale": 0.52,
+      "rocker_xy": [
+        246,
+        364
+      ],
+      "note": "Centers rocker in empty recess; rock/shift it for state feedback. Native sizes include large alpha padding. Runtime hit target should remain usable at small visual scale."
+    },
+    "rear-drawer": {
+      "space": "rear-room native canvas, pixels",
+      "cavity_xywh": [
+        449,
+        304,
+        529,
+        97
+      ],
+      "panel_canvas_closed_xywh": [
+        432.75,
+        260.3,
+        560.5,
+        181.2
+      ],
+      "panel_preview_open_offset_y": 50,
+      "note": "Uniform scale based on opaque width, not full canvas. Starting fit visually checked in asset preview; game depth/side edges and exact interaction remain Claude work."
+    },
+    "eyes": {
+      "space": "game 1600x900 reference",
+      "suggested_xywh": [
+        950,
+        215,
+        220,
+        110
+      ],
+      "note": "Put behind moving door and its clip. Darken/occlude broad skin fringe; never paste an unmasked rectangular face on top of the door."
+    },
+    "slipper": {
+      "anchor": "left toe / bottom sole in opaque bounds",
+      "suggested_world_width": 160,
+      "note": "Only toe end enters gap. Sole rests on threshold. Do not treat entire tall alpha canvas as physical hit box."
+    },
+    "lighting": {
+      "on": "images/front-lit.png",
+      "dim": "references/apartment.png",
+      "note": "Same 1672x941 canvas; major jamb alignment measured. Not a pixel-identity guarantee. Blend background plates only; do not accidentally fade door/eyes/hand/collision state."
+    }
+  },
+  "status": {
+    "file_validation": "PASS",
+    "game_integration": "UNVERIFIED; not performed",
+    "sensory_acceptance": "UNVERIFIED; user/Claude review required"
+  },
+  "audio_notes": [
+    "48kHz PCM16 stereo; load after user gesture. No autoplay.",
+    "Subtle stereo position is baked; do not double-pan without intention.",
+    "Runtime owns gains, pause/visibility/restart, timing and listener cues; do not let sound carry a contradictory state.",
+    "All audio is original procedural Foley, not field or actor recordings. No BGM, speech or licensed stock is included."
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-10-25",
+  "scope": "Asset production only; not integrated",
+  "images": [
+    {
+      "id": "front-lit",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-1468-73e3-93e8-b017eb95ec14/exec-e476e79b-1050-4887-b0fe-8fb336037c72.png",
+      "gimmicks": [
+        "G4"
+      ],
+      "alpha": false,
+      "refs": [
+        "references/apartment.png"
+      ],
+      "prompt": "Use case: lighting-weather\nAsset type: exact matching alternate lighting state for a 2D horror game background, PNG.\nInput image: the supplied apartment.png is the EDIT TARGET. Use its pixels, geometry, camera, and composition as the locked source.\nPrimary request: turn the BEDROOM lighting ON more fully, as though a warm ceiling light in the bedroom has switched on in addition to the visible bedside lamp. Illuminate the existing bedroom walls, bed, foreground floor, furniture, and coat area with believable warm amber incandescent light. The corridor seen through the sliding-door opening must remain cool cyan/teal and eerie, including its fluorescent fixture.\nComposition/framing: preserve the exact original canvas dimensions and every existing object at the same pixel position: camera angle, sliding-door opening and panels, doorframe, hallway doors, lamp, bed, plant, cabinets, coat rack, wall switch, floorboards. Do not recrop, zoom, rotate, add or remove anything.\nLighting/mood: warm brighter bedroom against the cool dark corridor. The bedroom should be visibly brighter than the source across the whole foreground, while retaining horror atmosphere.\nConstraints: change ONLY the room lighting and its natural shadows/highlights. Keep structural lines and textures precisely aligned to the source. No added door, person, eyes, monster, lettering, graphic, watermark, or decorative change."
+    },
+    {
+      "id": "eyes",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-1468-73e3-93e8-b017eb95ec14/exec-c26bba8a-6c02-4972-b194-70efa0cf91c2.png",
+      "gimmicks": [
+        "G3"
+      ],
+      "alpha": true,
+      "refs": [
+        "references/apartment.png",
+        "references/hand-grip.png"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: transparent PNG cutout sprite for a 2D psychological horror game.\nInput images: hand-grip.png is a STYLE AND PALETTE REFERENCE only, not an edit target; apartment.png is an environmental color reference only.\nPrimary request: a single pair of uncanny human eyes looking directly toward the viewer. Include only the eyes, eyelids, faint brows and a very small hint of nose bridge; most of the face is swallowed by deep shadow. The irises are human and dark, with restrained natural catchlights; the unease comes from an unwavering stare and subtle asymmetry.\nComposition/framing: wide horizontal slit, both eyes clearly visible and separated at natural human spacing; centered cutout with transparent margins. Readable when reduced to 160–260 pixels wide.\nStyle/medium: painterly realistic, textured and gritty, consistent with the realistic hand-grip reference. Desaturated skin, slate-gray shadow, muted brown and warm/cool contrast from apartment.\nTransparency: TRUE ALPHA CHANNEL around the eye pair and shadow fringe. No opaque rectangle, no black background fill, no checkerboard. Soft dark alpha edges around the shape.\nConstraints: one pair of eyes only. No full face, nose tip, mouth, hair, body, mask, pupils glowing neon, blood, wounds, gore, text, frame, watermark, or environmental backdrop."
+    },
+    {
+      "id": "slipper-wedge",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-1468-73e3-93e8-b017eb95ec14/exec-9e30e62f-83d1-4d70-bee0-3981e824667c.png",
+      "gimmicks": [
+        "G5"
+      ],
+      "alpha": true,
+      "refs": [
+        "references/apartment.png",
+        "references/hand-grip.png"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: transparent PNG cutout prop sprite for a 2D Korean apartment horror game.\nInput images: apartment.png is a STYLE, LIGHTING, AND PALETTE REFERENCE only; hand-grip.png is a realistic texture/style reference only.\nPrimary request: exactly ONE worn Korean house slipper that can plausibly act as a temporary wedge beneath a sliding door. Beige and muted olive cloth upper, low rubber sole, scuffed and compressed from use. Open-back indoor slipper with a broad fabric upper.\nComposition/framing: complete object, uncut, isolated in a low side/three-quarter view. TOE POINTS LEFT; HEEL POINTS RIGHT. Long horizontal silhouette, sole fully visible along bottom and thin enough to visually slide under a door. Give transparent margins on all sides, with no shadow extending far beyond the object.\nStyle/medium: painterly realistic, gritty textured prop that matches the apartment and hand-grip references; muted warm beige, olive-gray and brown, restrained cool edge light.\nTransparency: TRUE ALPHA CHANNEL around the complete slipper. No opaque rectangle or black/white/checkerboard background.\nConstraints: one slipper only, no pair, no foot, no floor, no sliding door, no room, no text, logo, watermark, gore or extra objects."
+    },
+    {
+      "id": "latch-body",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-4a17-7690-8c0e-60ad75d56095/exec-f12691fe-949a-4946-b542-6edcf86b313b.png",
+      "gimmicks": [
+        "G2"
+      ],
+      "alpha": true,
+      "refs": [
+        "references/apartment.png",
+        "references/door.png"
+      ],
+      "prompt": "Use case: transparent game prop cutout. Asset type: fixed layer of a two-piece animated door latch in a painterly realistic horror game. Input images are STYLE REFERENCE ONLY: match their ordinary worn Korean apartment realism, subdued warm tungsten light from left and cold green shadow from right; do not include the door, wood, room, or any background. Create one complete front-facing VERTICAL barrel-bolt latch FIXED ASSEMBLY: practical small rectangular aged dark steel mounting plate, two narrow aligned guide collars/straps with an obvious empty vertical channel for a separate sliding rod, visible screws, and a distinct lower receiver socket aligned below the guides. Clearly empty channel; absolutely NO movable rod, NO finger lever, NO slider in the body. Realistic modest home hardware, slightly scratched oxidized charcoal metal, clean silhouette and plausible geometry. Centered isolated single object on genuine transparent alpha with generous margins. Orthographic frontal view for layered 2D animation, consistent scale, no perspective tilt. No text, no icon, no wall, no wood, no shadow outside object, no atlas, no extra objects, no neon, no glossy 3D render."
+    },
+    {
+      "id": "latch-bolt",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-4a17-7690-8c0e-60ad75d56095/exec-6b82b8d1-fd44-465f-83e5-25001ac7acb1.png",
+      "gimmicks": [
+        "G2"
+      ],
+      "alpha": true,
+      "refs": [
+        "images/latch-body.png"
+      ],
+      "prompt": "Use case: transparent game prop cutout. Asset type: movable foreground layer paired with the supplied FIXED vertical barrel-bolt latch body reference. The reference image shows the exact aged charcoal steel finish, warm left highlight/cold green right shadow, guide alignment and width. Generate ONLY the removable sliding metal bolt: one straight vertical dark oxidized steel cylindrical rod, narrow enough to visually fit the central guide collars, with a short small sideways finger lever/loop attached around its middle and projecting to the RIGHT. The rod is a single complete movable piece with rounded upper tip and lower tip that can enter the lower receiver socket. No mounting plate, no screws, no fixed guide, no socket, no wall, no wood, no background. Front orthographic view, vertical upright, centered with generous transparent margins, genuine alpha. Painterly realistic ordinary Korean apartment hardware, practical worn steel with subtle scratches and subdued warm-left/cold-green-right lighting. Its length should approximately span from just above the upper guide to slightly below the lower guide when layered over the reference; do not claim precise pixel fit. No text, icon, neon, exaggerated ornament, 3D-render look, atlas, or additional objects."
+    },
+    {
+      "id": "switch-body",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-4a17-7690-8c0e-60ad75d56095/exec-635322b8-eb1b-4c95-be5d-d0a83261b5de.png",
+      "gimmicks": [
+        "G4"
+      ],
+      "alpha": true,
+      "refs": [
+        "references/apartment.png",
+        "references/door.png"
+      ],
+      "prompt": "Use case: transparent game prop cutout. Asset type: FIXED faceplate layer for a two-piece animated single wall rocker switch. Input images are STYLE REFERENCES ONLY: ordinary aged Korean apartment, painterly realistic texture, muted warm lamp light from left and cold green shadow from right. Create ONE isolated frontal aged ivory rectangular plastic electrical faceplate, vertical orientation, modest real domestic proportions, lightly yellowed and scuffed, with exactly two recessed screw heads, one above and one below a clearly EMPTY central vertical rectangular rocker recess. The recess must be open/dark and free of any switch rocker or toggle so a separate movable rocker can be layered into it. Slight beveled outer edge, plausible small practical wall hardware, frontal orthographic view and centered on genuine transparent alpha with generous margins. No rocker, no wall, no wallpaper, no text, no icon, no hand, no electrical sparks, no shadows outside the object, no atlas, no decorative ornament, no neon, no glossy 3D render."
+    },
+    {
+      "id": "switch-rocker",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-4a17-7690-8c0e-60ad75d56095/exec-839cf0a3-eb62-422b-9101-7f8514ee6bca.png",
+      "gimmicks": [
+        "G4"
+      ],
+      "alpha": true,
+      "refs": [
+        "images/switch-body.png"
+      ],
+      "prompt": "Use case: transparent game prop cutout. Asset type: MOVABLE rocker layer for a two-piece animated wall switch. Input image is the matching FIXED aged ivory faceplate reference, used only for its ivory plastic material, warm-left/cold-green-right lighting, frontal orientation, and the proportions of its central EMPTY recess. Generate ONE isolated small rectangular single rocker toggle ONLY: a complete piece of slightly yellowed ivory plastic, vertical orientation, modest convex/beveled front surface with subtle upper/lower plane change so it plausibly pivots within that recess, slight grime and fine scratches, warm tungsten light from left and cold green shadow from right. Keep the entire rocker visible and narrower/shorter than the recess in the reference, with adequate genuine transparent margins for rotation in 2D. Orthographic frontal view, centered upright. No faceplate, no screw, no wall, no background, no lettering, no icon, no ON/OFF marks, no hand, no atlas, no neon, no glossy 3D-render appearance. Painterly realistic Korean apartment hardware."
+    },
+    {
+      "id": "rear-room",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-78ee-7f80-9a14-3b5be0e0bad0/exec-38388212-d4f6-49ad-84ee-0d60c11859d5.png",
+      "gimmicks": [
+        "G7"
+      ],
+      "alpha": false,
+      "refs": [
+        "references/apartment.png",
+        "references/door.png"
+      ],
+      "prompt": "FINAL 16:9 landscape background game art, painterly photorealistic. Opposite first-person view inside a tiny aged Korean studio apartment. Faded beige floral wallpaper, worn walnut floor, low warm lamp glow left and subtle cold blue spill. Sparse ordinary furnishings. Dark walnut chest of drawers prominent CENTER-LEFT, chest exactly frontal to camera with horizontal edges level. Entire upper drawer front panel is REMOVED, leaving a plainly visible empty dark rectangular cavity framed by wood rails. Lower two or three drawers closed with small dark handles. Bed edge with muted plaid bedding on RIGHT. Chest fully within image and upper cavity easily located and unobstructed for animation overlay. No upper drawer panel. No extra doors. No hand, person, monster, text, UI, watermark."
+    },
+    {
+      "id": "rear-drawer-front",
+      "source": "C:/Users/USER/.codex/generated_images/01a16f64-78ee-7f80-9a14-3b5be0e0bad0/exec-88fb4730-8935-4d31-8022-eb6f737fd198.png",
+      "gimmicks": [
+        "G7"
+      ],
+      "alpha": true,
+      "refs": [
+        "images/rear-room.png",
+        "discarded initial generated drawer-front styling reference (not shipped)"
+      ],
+      "prompt": "Targeted repair of the supplied separate drawer-front sprite: keep the same dark worn walnut, one centered small black recessed oval handle, warm left/cool right lighting and true transparent PNG cutout, but make the panel much WIDER AND SHALLOWER: exact physical front face aspect ratio approximately 5.0:1 width to height, matching the empty top opening in the supplied rear-room plate (image 1, cavity approximately x449-978, y304-401 on a 1672x941 canvas). Front-facing flat horizontal wooden rectangle with its entire boundary visible, no perspective skew, no drawer box, no cabinet, no cavity, no background, no wall/floor, no text/UI. Use image 1 for dimensions and matching grain/lighting and image 2 as prior panel styling. Alpha transparency outside the panel, including all margins; no opaque shadow backdrop. Keep panel centered and fill about 90% of image width with small transparent margins."
+    }
+  ]
+}
