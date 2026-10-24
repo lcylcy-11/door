@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="문 하나, 아래층의 노크, 그리고 틈으로 들어오는 손. 마우스로 플레이하는 2D 1인칭 공포 시안.">
+  <title>문 좀 살살 — 문틈</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="preload" as="image" href="./assets/apartment.png">
+  <link rel="preload" as="image" href="./assets/door.png">
+  <link rel="preload" as="image" href="./assets/hand.png">
+</head>
+<body>
+<main class="game-page">
+  <header class="topbar">
+    <a class="wordmark" href="./">문 좀 살살<span>문틈</span></a>
+    <p class="objective" id="objective">문 너머를 확인하고, 무사히 닫으세요.</p>
+    <nav aria-label="게임 제어">
+      <button id="sound" aria-pressed="true">소리 켜짐</button>
+      <button id="pause" disabled>일시정지</button>
+      <button id="restart" disabled>다시 시작</button>
+    </nav>
+  </header>
+  <section class="scene" id="scene" aria-label="중문을 바라보는 1인칭 화면">
+    <img class="apartment" src="./assets/apartment.png" alt="희미한 조명 아래 낡은 중문과 어두운 복도가 보이는 원룸" draggable="false">
+    <svg id="world" class="world" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-label="왼쪽으로 밀어 여는 중문">
+      <defs><clipPath id="opening"><rect x="700" y="80" width="488" height="695"/></clipPath></defs>
+      <g clip-path="url(#opening)">
+        <g id="doorLayer"><rect x="700" y="80" width="488" height="695" fill="#302c22"/><image href="./assets/door.png" x="510" y="80" width="860" height="695" preserveAspectRatio="none"/></g>
+        <rect id="corridorShade" x="700" y="80" width="488" height="695" fill="#041517" opacity=".1"/>
+        <image id="hand" href="./assets/hand.png" x="1000" y="490" width="380" height="253" opacity="0"/>
+      </g>
+      <g class="knock-mark" id="knockMark" opacity="0" aria-hidden="true"><path d="M760 790l-8 16m43-12v22m34-27 8 17"/><text x="795" y="850" text-anchor="middle">쿵. 쿵. 쿵.</text></g>
+    </svg>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="timepiece" aria-label="시각">02<span>:</span>17</div>
+    <div class="room-caption" aria-hidden="true">침실 쪽 · 중문</div>
+    <button id="handle" class="handle" aria-label="문손잡이. 누른 채 왼쪽으로 열고, 오른쪽으로 닫기" aria-keyshortcuts="ArrowLeft ArrowRight" disabled><span class="handle-ring" aria-hidden="true"></span></button>
+    <span class="handle-hint" id="handleHint">누른 채 ← 열기</span>
+    <div id="warning" class="warning" aria-hidden="true"></div>
+    <div class="intro" id="intro">
+      <div class="paper">
+        <h1>문 좀 살살.</h1>
+        <p class="note-lead">아랫집이 예민합니다.<br>밤에는 문을 조심히 여닫아 주세요.</p>
+        <div class="note-rules"><p><b>아래에서 노크하면</b><br>멈추고, 조용해질 때까지 기다리세요.</p><p><b>문틈에 손이 보이면</b><br>그때는 소리가 나도, 빨리 닫으세요.</p></div>
+        <button class="primary" id="start" disabled>문 앞에 서기 <span aria-hidden="true">→</span></button>
+        <small id="loadStatus">방 안을 준비하고 있어요.</small>
+      </div>
+    </div>
+    <div id="end" class="end" hidden role="dialog" aria-modal="true" aria-labelledby="endTitle">
+      <div class="end-content"><h2 id="endTitle"></h2><p id="endCopy"></p><button id="again" class="primary">다시 문 앞에 서기 <span aria-hidden="true">→</span></button></div>
+    </div>
+    <div id="pauseLayer" class="pause-layer" hidden role="dialog" aria-modal="true" aria-labelledby="pauseTitle"><div><h2 id="pauseTitle">잠깐, 숨 고르기.</h2><p>문밖의 시간도 멈췄습니다.</p><button id="resume" class="primary">이어서 하기</button></div></div>
+  </section>
+  <footer class="bottom-bar">
+    <div class="subtitle-wrap"><span class="sound-location" id="location">방 안</span><p id="subtitle" role="status" aria-live="polite">아래층에서는 TV 소리가 희미하게 들립니다.</p></div>
+    <p id="instruction" class="instruction">마우스로 손잡이를 잡고 드래그 · Esc 일시정지</p>
+  </footer>
+  <p class="prototype-note">한 장면의 공포 시안 · 약 1분 · 소리를 꺼도 신호가 표시됩니다. <a href="../2d/">이전 시안</a></p>
+</main>
+<script src="./core.js"></script><script src="./game.js"></script>
+</body>
+</html>

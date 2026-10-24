@@ -1,0 +1,24 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-10-25",
+  "assets": [
+    {
+      "file": "dist/horror/assets/apartment.png",
+      "source": "exec-9ec0649c-2b58-4a51-ae59-a67eb0a4fb59.png",
+      "transparent": false,
+      "prompt": "Use case: stylized-concept. Asset type: full-screen background plate for a 2D first-person Korean apartment horror browser game. Create one polished cinematic hand-painted environment, widescreen 16:9. Eye level looking straight at a sliding interior doorway in a tiny older Korean studio apartment at 2 a.m. The door panel is REMOVED so an empty rectangular doorway reveals a narrow dark blue-green corridor, distant closed bathroom door, tiny dim ceiling fluorescent, worn beige wallpaper, wood floor, subtle damp stains, a quiet coat hanging at far right and small light switch on the left wall. Camera perfectly frontal, no tilt, no fisheye. Door opening in exact image area x=43% through 76%, y=13% through 88%; left of opening is a solid wall pocket where the sliding panel can hide. Door frame dark weathered brown wood, threshold visible. This is an empty scene behind a separately animated sliding door, so leave the entire doorway empty of foreground door, handle, hands, people, monsters. Moody painterly realistic indie horror artwork with strong readable shapes and detailed materials, restrained cold teal corridor contrasted with a faint warm room spill, sufficiently visible midtones for interactive gameplay, NOT pitch black. No interface, no text, no lettering, no logo, no border, no figures, no generated grain filter, no 3D render aesthetic. Art-directed high-fidelity 2D environment painting, believable ordinary home made uneasy by the empty corridor."
+    },
+    {
+      "file": "dist/horror/assets/door.png",
+      "source": "exec-c8cbc829-c725-43f2-9e77-73cb6ad3a480.png",
+      "transparent": true,
+      "prompt": "Use case: stylized-concept. Asset type: single 2D horror game sliding-door panel cutout, actual transparent background. Perfectly frontal orthographic elevation, tall narrow rectangular wooden interior sliding door, width to height ratio 0.68, fills frame with small transparent margin. Aged dark walnut frame, inset large dirty frosted olive glass in the upper two thirds, solid weathered timber lower third. Recessed dark metal pull handle near RIGHT edge at mid-height, subtle rub marks and scratches near handle, dim warm spill from left, cold greenish edge light from right. Painterly realistic indie psychological horror environment art, rich material detail, restrained midtones with enough visibility for playing, no neon no horror face no figure no surrounding door frame no wall no floor no cast shadow outside panel. This is the movable panel only. No text, no typography, no UI. All outer edges straight and vertical, no perspective, no hinges, transparent alpha outside rectangle."
+    },
+    {
+      "file": "dist/horror/assets/hand.png",
+      "source": "exec-a30e9224-e71d-44ec-bc66-37e8babfd58f.png",
+      "transparent": true,
+      "prompt": "Use case: stylized-concept. Asset type: transparent 2D sprite for a first-person psychological horror game. Isolated long unnaturally pale human right hand and a short forearm entering horizontally from the RIGHT side, reaching toward the LEFT. Back of hand visible three-quarter front view, four long bony fingers curling downward and to the left as if grasping a vertical door edge, thumb visible below, anatomically convincing five fingers, slight elongated uncanny proportions. Desaturated grey skin with cold greenish shadows and dirty muted nails, painterly realistic detailed style for dark apartment game, faint warm edge light. Wrist cropped at the far right edge, fingers fully inside frame, fingertips point left. Opaque pale skin with clear readable silhouette. Actual transparent background, no door, no wall, no text, no blood, no gore, no extra limbs, no effects, no cast shadow outside hand."
+    }
+  ]
+}

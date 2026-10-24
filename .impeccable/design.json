@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "title": "Design System: 문 좀 살살 — 문틈",
+  "extensions": {
+    "shadows": [
+      {"name":"paper","value":"6px 12px 35px #08070465","purpose":"시작 종이를 장면 앞에 표시"},
+      {"name":"handle-ring","value":"0 3px 10px #06090560","purpose":"작은 손잡이 고리의 깊이"}
+    ],
+    "breakpoints": [
+      {"name":"tablet","value":"900px"},
+      {"name":"mobile","value":"600px"}
+    ]
+  },
+  "components": [
+    {
+      "name":"주요 버튼",
+      "kind":"button",
+      "refersTo":"primary-button",
+      "description":"시작, 재시작, 이어하기",
+      "html":"<button class=\"ds-primary\">문 앞에 서기</button>",
+      "css":".ds-primary{min-height:48px;padding:15px 17px;border:1px solid #626249;border-radius:0;background:#263228;color:#eee7d4;font:14px sans-serif}.ds-primary:hover{background:#3a4936}.ds-primary:focus-visible{outline:2px solid #e5cf98;outline-offset:5px}"
+    },
+    {
+      "name":"문손잡이",
+      "kind":"custom",
+      "description":"장면의 드래그 입력",
+      "html":"<button class=\"ds-handle\" aria-label=\"문손잡이\"><span></span></button>",
+      "css":".ds-handle{min-width:40px;min-height:52px;border:0;background:transparent;cursor:grab;touch-action:none}.ds-handle span{display:block;width:27px;height:49px;border:1px solid #e0d5a875;border-radius:13px;box-shadow:0 3px 10px #06090560}"
+    }
+  ],
+  "narrative": {
+    "overview":"한 문을 조작하는 2D 1인칭 공포 시안의 구현 기록. 미감과 공포감은 사용자 검토 전이다.",
+    "keyCharacteristics":["큰 중문과 제한된 시야","문을 멈출 노크와 빨리 닫을 손","소리와 시각 신호 병행"],
+    "rules":[],
+    "dos":["장면 크롭과 드래그 좌표계를 함께 유지","무음에서도 행동 신호 표시"],
+    "donts":["프로토타입 수치를 전체 게임의 최종 결정으로 취급하지 않기"]
+  }
+}
