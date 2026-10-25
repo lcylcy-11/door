@@ -1,18 +1,14 @@
 # Current state
 
-- Writer now: none
-- Current checkpoint H3: PASS — asset production and manual Claude handoff complete. New game mechanics were NOT implemented or integrated.
-- Asset feature commit: `c316e88` on `codex/first-person-horror`; source baseline `ce24928`. Historical H2 feature `da8d763`; H1 feature `6e7d97b`.
-- Latest user authority: include all seven proposed tension gimmicks, but use Claude for implementation. Codex was authorized only to create assets and prepare the handoff; no Claude launch/message or user-visible chat creation was authorized/performed.
-- Deliverable: `asset-packs/door-horror-gimmicks-v1/` — 9 new PNGs, 4 unchanged reference PNGs, 18 original procedural WAVs, manifest/anchors/loop metadata, provenance, static asset preview, validation and Korean `HANDOFF-CLAUDE.md`.
-- PASS evidence: 13 PNG decode/hash/alpha checks, 18 WAV PCM/amplitude/DC/loop checks, G1–G7 coverage, all 9 new images visually inspected, browser hardware/drawer composites and media decoding/playback path, provenance scan 13/0 missing, independent bounded handoff review. See pack `QA.md` and `validation.json`.
-- Protected runtime unchanged: baseline diff empty for dist/, existing tests/scripts/package/hosting and product/design/planning docs. Only the new asset pack and this tracker changed. No push or deployment.
-- UNVERIFIED: game integration, seven-gimmick runtime, final visual/sonic acceptance and fear. H2's continuous physical held-mouse resistance trace also remains UNVERIFIED; H3 does not resolve it.
-- Ownership: root stopped writing after this record. Image producers wrote only unique default image-tool outputs; root alone copied/packaged. Intended gpt-6-sol / medium dispatch, execution metadata UNVERIFIED; no host settings changed.
-- Next owner: Claude, not started. User manually supplies the pack handoff in a new Claude chat. Successor must read Writer/checkpoint, then claim Writer before implementation.
-- Next finite task: integrate all seven approved gimmicks with teachable cues and avoid impossible simultaneous demands; verify actual mouse paths before human fear review. Suggested Claude Opus for combined rule/experience work; no fixed timing or new control scheme was approved by the asset handoff.
-- Preview: `http://127.0.0.1:5175/` is a local-only asset viewer retained for review; all audio paused. Existing H2 game remains at port 5174. Preview is also standalone `index.html` inside the pack.
-- Recovery: revert asset commit `c316e88` to remove the pack; H2 game stays intact. No uncommitted implementation work left for Claude.
+- Writer now: Claude (Opus 5.5) — H4 seven-gimmick integration, claimed 2026-10-25 from clean `ea3072b`; releasing after the H4 commit (see checkpoint note below)
+- Current checkpoint H4: PASS for AI implementation and verification — all seven gimmicks integrated into a rebuilt one-door night; human fear/feel review pending (not accepted, not released).
+- What exists: `/horror/` is now one night in chapters: P0 unlatch → C1 stiff rail under elevator/traffic cover (G1) → C2 corridor light dies; dark-adapt or switch the light (G4) → C3 glass knocks + H2 hand → C4 eyes, look down and grip (G3) → C5 mimicking fingers (G6) → C6a drawer behind (G7) → C6b slipper wedge (G5) → C6c wedge + drawer → C7 forced pull → F1 eyes under the elevator → F2 last hand → F3 latch between knocks (G2, G4 consequence) → drawer closes behind you. Chapter checkpoints, retry, restart, pause.
+- Architecture: `dist/horror/night.js` (deterministic rules, fixed 1/120 s steps), `tuning.js` (every value PROVISIONAL), `contours.js` (generated from the WAVs; masking judged from the same gain the audio plays), `captions.js` (Korean text + sound/visual twins), `sound.js`, `game.js` (camera = SVG viewBox shared by rendering and hit-testing). Old `core.js` and `tests/horror.test.cjs` retired (H2 assertions ported).
+- PASS evidence: `npm test` 135/135; real-mouse CDP battery (`npm run play`): desktop win, lit win, narrow 390×844 win, muted win, all 7 failure causes with retry/restart, Esc pause in 7 threat beats, audio probe (gain ≤ 0.012, offset ≤ 51 ms), no covered controls; independent review (38 confirmed findings) fixed. See `docs/horror-qa.md` H4.
+- UNVERIFIED: fear, pacing, mouse feel, HUD balance and mix (human); physical mouse/trackpad/Mac/phone/Safari. Real-mouse here means trusted browser input via CDP, not a physical device.
+- Open questions for the user (provisional choices, not decisions): HUD vs diegetic balance; right-button look-down and edge turn button; run length (~4 min perfect, 6–8 min typical); flagged H2 variants (C3 holds the door at 0.45, F2 hand does not pry); the one forced pull and the ending sting; lit-finale trade-offs; C5 mimic pacing (real-mouse bot took ~50–60 s).
+- Preview: `http://127.0.0.1:5174/horror/` via `.claude/launch.json` (`node scripts/serve.cjs`, PORT 5174; local file, not committed). The earlier Codex-run 5174/5175 servers were found stopped. No push or deployment.
+- Recovery: revert the H4 feature commit to return to H3 (`ea3072b`); the asset pack is untouched.
 
 ## Task list
 
@@ -29,6 +25,13 @@
 | H3-IMAGE | Nine image assets for seven added gimmicks | root + isolated image producers | PASS — 9 new PNGs + 4 unchanged references, inspected and alpha/dimensions validated |
 | H3-SOUND | Eighteen original WAV cues/loops | root | PASS — 48kHz/PCM16/stereo, 42.55s total, 3 loops; perceptual acceptance UNVERIFIED |
 | H3-PACK | Manifest, preview, QA, Claude handoff | root | PASS — c316e88, pack/HANDOFF-CLAUDE.md; no game implementation |
+| H4-DESIGN | Integrate all seven gimmicks fairly (design) | Claude + design panel (3 designers, 2 judges, synthesis) | PASS — spec chosen: fairness-first base with grafts; all values provisional |
+| H4-IMPL | Implement all seven gimmicks with the pack assets, keep slow opening | Claude | PASS — rebuilt rules/view; G1–G7 each taught alone, then paired; H2 constants kept |
+| H4-REBUILD | User mid-task: "필요하다면 현재 게임 전부 뜯어고쳐도 됨. 완성도를 최우선으로" | Claude | DONE — full rebuild of `/horror/`; `/2d/` untouched |
+| H4-MOUSE | Verify real mouse play | Claude | PASS — CDP trusted-input battery: wins (desktop/lit/narrow/muted), held drags, right+left chords, clicks, bolt drags; physical device UNVERIFIED |
+| H4-COLLIDE | Verify threat collisions | Claude + test-writer agent + reviewers | PASS — collision matrix (docs/horror-qa.md), 2000-run fuzz invariants, real-mouse combos, pause during threats |
+| H4-REVIEW | Independent review and fixes | 3 reviewers + verifiers | PASS after fixes — 38 confirmed findings fixed or decided |
+| H4-HUMAN | Fear, pacing, mouse feel, mix, HUD balance | user | UNVERIFIED — awaits play at /horror/ |
 
 ## User decisions
 
@@ -36,6 +39,7 @@
 - Prior six-minute timeline and three-threat proposal remain design proposals, not mandatory content for this prototype.
 - Implementation choices/timing/art are provisional and require human experience review.
 - H2 user decision (async answer): choose "밀어 버티기" — hand grips and pushes door open; increase force on a push, ease off when noise rises. The alternative wait-then-close rule was not selected.
+- H4 user decision (2026-10-25, Claude chat): implement all seven gimmicks with the prepared assets; keep the slow-opening tension; verify real mouse play and threat collisions. Mid-task addition: "필요하다면 현재 게임 전부 뜯어고쳐도 됨. 완성도를 최우선으로 해서 만들어." — full rebuild of the horror game authorized if needed; completeness/quality is the top priority.
 - H3 user decision: include all seven newly proposed gimmicks (masking external sound, final latch, avoid eye contact, choose light for information, temporary wedge/retrieval, mimic movement bait, look behind at drawer). User will use Claude for implementation; Codex is authorized ONLY for asset production and handoff preparation. This does not approve arbitrary timings or simultaneous threat combinations.
 
 ## H3 finite boundary
