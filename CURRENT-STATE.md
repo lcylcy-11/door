@@ -1,14 +1,15 @@
 # Current state
 
-- Writer now: Claude (Opus 5.5) — H4 seven-gimmick integration, claimed 2026-10-25 from clean `ea3072b`; releasing after the H4 commit (see checkpoint note below)
-- Current checkpoint H4: PASS for AI implementation and verification — all seven gimmicks integrated into a rebuilt one-door night; human fear/feel review pending (not accepted, not released).
+- Writer now: none — Claude released after recording this checkpoint (2026-10-25)
+- Current checkpoint H4: PASS for AI implementation and verification — feature commit `7ac427e` on `codex/first-person-horror` (from `ea3072b`); all seven gimmicks integrated into a rebuilt one-door night; human fear/feel review pending (not accepted, not released).
 - What exists: `/horror/` is now one night in chapters: P0 unlatch → C1 stiff rail under elevator/traffic cover (G1) → C2 corridor light dies; dark-adapt or switch the light (G4) → C3 glass knocks + H2 hand → C4 eyes, look down and grip (G3) → C5 mimicking fingers (G6) → C6a drawer behind (G7) → C6b slipper wedge (G5) → C6c wedge + drawer → C7 forced pull → F1 eyes under the elevator → F2 last hand → F3 latch between knocks (G2, G4 consequence) → drawer closes behind you. Chapter checkpoints, retry, restart, pause.
 - Architecture: `dist/horror/night.js` (deterministic rules, fixed 1/120 s steps), `tuning.js` (every value PROVISIONAL), `contours.js` (generated from the WAVs; masking judged from the same gain the audio plays), `captions.js` (Korean text + sound/visual twins), `sound.js`, `game.js` (camera = SVG viewBox shared by rendering and hit-testing). Old `core.js` and `tests/horror.test.cjs` retired (H2 assertions ported).
 - PASS evidence: `npm test` 135/135; real-mouse CDP battery (`npm run play`): desktop win, lit win, narrow 390×844 win, muted win, all 7 failure causes with retry/restart, Esc pause in 7 threat beats, audio probe (gain ≤ 0.012, offset ≤ 51 ms), no covered controls; independent review (38 confirmed findings) fixed. See `docs/horror-qa.md` H4.
 - UNVERIFIED: fear, pacing, mouse feel, HUD balance and mix (human); physical mouse/trackpad/Mac/phone/Safari. Real-mouse here means trusted browser input via CDP, not a physical device.
 - Open questions for the user (provisional choices, not decisions): HUD vs diegetic balance; right-button look-down and edge turn button; run length (~4 min perfect, 6–8 min typical); flagged H2 variants (C3 holds the door at 0.45, F2 hand does not pry); the one forced pull and the ending sting; lit-finale trade-offs; C5 mimic pacing (real-mouse bot took ~50–60 s).
 - Preview: `http://127.0.0.1:5174/horror/` via `.claude/launch.json` (`node scripts/serve.cjs`, PORT 5174; local file, not committed). The earlier Codex-run 5174/5175 servers were found stopped. No push or deployment.
-- Recovery: revert the H4 feature commit to return to H3 (`ea3072b`); the asset pack is untouched.
+- Recovery: revert `7ac427e` (and its tracker follow-ups) to return to H3 (`ea3072b`); the asset pack is untouched.
+- Resume note: no uncommitted implementation work. Next is the user's play review (H4-HUMAN); tuning changes go in `dist/horror/tuning.js`, then `npm test` and `npm run play -- all`.
 
 ## Task list
 
