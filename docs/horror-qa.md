@@ -1,6 +1,47 @@
 # One-door prototype verification — 2026-10-25
 
-## Current H2 checkpoint — force resistance and sound
+## Current H4 checkpoint — seven tension gimmicks (rebuild)
+
+Scope: user instruction to implement all seven gimmicks with the H3 asset pack, keep the slow door-opening tension, verify real mouse play and threat collisions; mid-task the user allowed a full rebuild with completeness first. Design: three independent designs, two judges, one synthesis (fairness-first base with grafts). Implementation: deterministic rules model `dist/horror/night.js` + `tuning.js` (all values provisional), `contours.js` (generated from the WAVs), `captions.js` (Korean text + sound/visual twins), `sound.js`, `game.js`. H2 hand constants unchanged; two flagged variants (C3 holds the door at 0.45; F2 hand does not pry).
+
+| H4 check | Result | Evidence / limits |
+|---|---|---|
+| Parse + contours | PASS | `npm run check` 14 JS files; `npm run contours` — masking judgement contours regenerate byte-identical from the WAVs |
+| Rules + regressions | PASS | `npm test`: 135 tests (124 H4: units per gimmick, H2 parity incl. 21-force sweep, 2000-run seeded collision fuzz with invariants, dark/lit ideal bots, 0.35 s-reaction bot clears and 1.2 s bot fails, failure-policy sweeps, pause freeze, canonical checkpoints, twins coverage; 10 old 2D + 1 PCM) |
+| Real mouse, full night (desktop 1280×800) | PASS | `scripts/play-mouse.cjs`: Edge via CDP trusted input — held left drags streamed per frame, right-button chords (look down while gripping), clicks for turn/switch/slipper, slow vertical bolt drags; win reached at ~190 s; dark route |
+| Real mouse, lit route / narrow 390×844 / muted | PASS | lit-switch route win; narrow full-night win; muted full-night win |
+| Every failure cause by real input + retry + restart | PASS | noise (C1), eyes (C4), hand (C3), strain (C3), mimic (C5), drawer (C6a), forced (C6b): distinct ending each; 「이 장면부터 다시」 restores the chapter checkpoint with attention ≤ 0.30; 「처음부터」 resets to the latched door |
+| Esc pause during each threat | PASS | C3, C4, C5, C6a, C6b, F1, F2: simulation snapshot frozen for 1 s, AudioContext suspended, pause layer shown, resume with rate-limited grace |
+| Masking judgement = played gain | PASS | per-100 ms probe of the real GainNodes: steady error ≤ 0.012 (bound 0.02), offset ≤ 51 ms (bound 60 ms); during 0.3 s duck ramps the node trails by about one frame (≤ 0.033, reported separately); samples within 80 ms of a clamped frame are re-locked by design and excluded |
+| No covered controls | PASS | every enabled control was topmost at its centre throughout every run (found and fixed: the 「시선 ↓」 toggle covered the slipper on narrow screens) |
+| Independent review | PASS after fixes | 3 read-only reviewers + adversarial verifiers: 38 confirmed findings (1 P0, 11 P1, rest P2), all fixed or decided; test-writer agent's 11 findings fixed or decided |
+| Asset provenance | PASS | 9 runtime WebPs derived from pack PNGs (hash-checked against the pack manifest), 18 WAVs byte-identical; `docs/horror-assets.json`, `scripts/prepare-h4-assets.py` |
+| Fear, pacing, mouse feel, mix, HUD balance | UNVERIFIED | human review required |
+| Physical mouse / trackpad / Mac ctrl-click / real phone / Safari | UNVERIFIED | CDP trusted input exercises the browser's real pointer pipeline, not a physical device |
+
+### Threat collisions (where two demands meet)
+
+| Pair | Occurs | Verified by |
+|---|---|---|
+| G1 masks × G4 switch (C2), × G6 mimic (C5), × G3 eyes (F1), × G2 latch (F3) | yes | real-mouse wins (cover-aware moves); unit tests: masks never cover slam, rattle, light leak, eyes, strain, pinch, drawer or enemy force |
+| G3 eyes × gripping the handle (C4 chord) | yes | real right+left chord in every win; chorded presses routed explicitly (browsers send no pointerdown for them — found by the real-mouse run) |
+| G5 wedge × G7 drawer (C6c) | yes | real-mouse wins; worst-case timeline unit test |
+| G2 latch × G4 light (F3) | yes | dark and lit wins; seat limit 0.30 dark / 0.50 lit |
+| G3 eyes × G7 turn, G2 × G3/G5/G6/G7/H2, G5 × H2, G6 × G7 | never | fuzz invariants every frame (eyes never with an open drawer, never gaze-down while turned, bolt only with no hand / wedge at rest / door ≤ 0.03, no masks in C6) |
+| Warning knocks × any threat | yes | warnings ask only for silence; every threat response is silent |
+| Pause / blur × any threat | yes | pause checks above |
+
+### Fixes found by verification (selected)
+
+- Real mouse: a left press made while the right button is held (looking down) produced no grab → chorded pointer transitions routed; gaze made level-triggered so a press during a turn is applied once possible.
+- Narrow screens: gaze toggle covered the slipper; HUD covered the handle (look-down) and latch (finale); switch hit area was offset.
+- Rules: P0 softlock when re-seating the bolt; C5 dead state above the bait ceiling; closing before the light check skipped the eyes chapter; frame-rate-dependent thresholds (now fixed 1/120 s steps); bolt rattle cooldown exploit; a long flick chaining four slams; light leak never sounding warnings; masks lingering into the drawer chapter.
+
+Captures (ignored): `.impeccable/review/h4/` per beat for desktop/lit/narrow/failures, `.impeccable/review/h4/review/` eyes, fingers and drawer. `?cp=` starts were used only for captures and debugging, never as PASS evidence. Local server: `http://127.0.0.1:5174/horror/` (`.claude/launch.json`, not committed). No push or deployment.
+
+## Historical H2 checkpoint
+
+### H2 — force resistance and sound
 
 User verdict on H1: fear and instant-slam tension FAIL; slow-opening tension positive. User explicitly selected force resistance. H1's instant-close rule is superseded; its older evidence below describes the earlier checkpoint only.
 

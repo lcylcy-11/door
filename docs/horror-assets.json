@@ -26,6 +26,207 @@
       "transparent": true,
       "prompt": "Use case: precise-object-edit. Asset type: alternate transparent hand sprite for a 2D first-person horror game. Reference image: preserve this SAME pale long-fingered hand, painterly realistic shading, dirty nails and cold greenish skin, but CHANGE THE POSE to GRIPPING the vertical edge of a sliding door. Forearm enters from the RIGHT edge, palm seen from back at a slight angle. Four bony fingers clustered vertically near the LEFT side, bent sharply at the middle joints and curled around an INVISIBLE vertical edge, fingertips hooking slightly toward the viewer. Thumb curls below. Taut knuckles and tendons indicate a heavy force pulling left. Keep wrist horizontal and cropped on the RIGHT edge. Fingers must look like they can grip a thin vertical door edge rather than an open outstretched claw. All five fingers anatomically coherent, no extra limbs. Sparse faint warm light on finger ridges, deep greenish shadows, no blood no gore. Isolated cutout, ACTUAL transparent alpha background, no door no edge no wall no aura no text. The sprite will be positioned with its leftmost fingers on an animated wood door edge and its right forearm hidden behind the opposite jamb. Avoid extremely wide transparent margins. Maintain the same framing and left-reaching orientation as reference, broad landscape aspect.",
       "reference": "dist/horror/assets/hand.png"
+    },
+    {
+      "file": "dist/horror/assets/eyes.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/eyes.png",
+      "source_sha256": "d0a6f91823713d39dcd92e46f25b3d562ae3f83d6418ce5bfb97e56d37f42b5b",
+      "sha256": "7481cc7b6164b467693419029afbbf3efe80568178043619e4ac8a562cc869cb",
+      "processing": "crop to opaque bounds [76,158,1708,758], alpha-fringe colour replaced from solid interior, scale 0.5, WebP q90 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#eyes"
+    },
+    {
+      "file": "dist/horror/assets/latch-body.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/latch-body.png",
+      "source_sha256": "7df34109eb0c50ae3fb07ece2bd02c2a3dc8c3c190a4575eb0ed0174baf00a00",
+      "sha256": "e4c2bcc020b9929a2700fb1491bbdf9519b79c2dd91154a4e56fea400a9e312c",
+      "processing": "crop to opaque bounds [342,87,701,1381], alpha-fringe colour replaced from solid interior, scale 0.5, WebP q90 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#latch-body"
+    },
+    {
+      "file": "dist/horror/assets/latch-bolt.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/latch-bolt.png",
+      "source_sha256": "2d095e5e42bc389d6749bb2d5ac8cb7d172d3f42449426d7e98159d4201f3c07",
+      "sha256": "088b7b3af5482da716080d7e1bbd8b830c5616ed2fb218d3f7977587e20ecde6",
+      "processing": "crop to opaque bounds [442,51,723,1484], alpha-fringe colour replaced from solid interior, scale 0.375, WebP q90 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#latch-bolt"
+    },
+    {
+      "file": "dist/horror/assets/switch-body.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/switch-body.png",
+      "source_sha256": "9a8d0af6f4d277d5f2f9918ea1fed20587977c1e81825afcb83f460a2de7ffec",
+      "sha256": "9370a3941925d472bcea5e3bf9f5732dec00fdf16cc574c471b8ff4ecd22cbb2",
+      "processing": "crop to opaque bounds [181,126,844,1412], alpha-fringe colour replaced from solid interior, scale 0.3, WebP q90 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#switch-body"
+    },
+    {
+      "file": "dist/horror/assets/switch-rocker.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/switch-rocker.png",
+      "source_sha256": "31793b725df640859acd98066e7c889effeec7043bdabdcf46dfb46d9e670569",
+      "sha256": "cdcfb846ade6eb79cd15c04495c44384661b1dae4b2d156fee01bd1319a71cb9",
+      "processing": "crop to opaque bounds [309,265,716,1268], alpha-fringe colour replaced from solid interior, scale 0.156, WebP q90 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#switch-rocker"
+    },
+    {
+      "file": "dist/horror/assets/slipper-wedge.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/slipper-wedge.png",
+      "source_sha256": "bf7a86ccf30151cf3c678b6b5f03e1f06f85cec83850cc38f4ba867a192d8054",
+      "sha256": "631e4a3b3e0b557b3a41c34abf18329b40b53b67322109192e4d41f665d4e143",
+      "processing": "crop to opaque bounds [62,167,1723,761], alpha-fringe colour replaced from solid interior, scale 0.3, WebP q90 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#slipper-wedge"
+    },
+    {
+      "file": "dist/horror/assets/rear-drawer-front.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/rear-drawer-front.png",
+      "source_sha256": "836f87b7ffa96d93fb444605ee36454e78c79b2ee170eb846dda4c26df3ef437",
+      "sha256": "a212af84e817c5d80d63238c863762156b1514e474b60e820080817b01777652",
+      "processing": "crop to opaque bounds [64,172,2147,541], alpha-fringe colour replaced from solid interior, scale 0.5, WebP q90 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#rear-drawer-front"
+    },
+    {
+      "file": "dist/horror/assets/front-lit.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/front-lit.png",
+      "source_sha256": "4ed74973b7cda26087b0063765c7142907879d9bd274982958d1fe6fbe1e27fb",
+      "sha256": "945e9c5c65ef9c6171cd39172c4d56c7ea88491104252af9ee053c3916b24ca9",
+      "processing": "full canvas re-encoded WebP q88 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#front-lit"
+    },
+    {
+      "file": "dist/horror/assets/rear-room.webp",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/images/rear-room.png",
+      "source_sha256": "6425d5c5c1413f1bb28b3124885664508229fee133225997874f7265ab8ad5b2",
+      "sha256": "c4c419e3ec016bc0f3576ea043d81f855a6e84777286c19b904320f236281f13",
+      "processing": "full canvas re-encoded WebP q88 (scripts/prepare-h4-assets.py)",
+      "prompt_ref": "asset-packs/door-horror-gimmicks-v1/image-provenance.json#rear-room"
     }
-  ]
+  ],
+  "audio": [
+    {
+      "file": "dist/horror/assets/audio/mask-elevator-loop.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/mask-elevator-loop.wav",
+      "sha256": "1c6c67001f0d61c8cc041e4e455c0ef1541c07ad30f8cf11aa961a9aceff8d2d",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/mask-traffic-pass.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/mask-traffic-pass.wav",
+      "sha256": "9bae56ed15cbe7d3309cdb085c3fe1870aac3c0ace1ccf52a279aa26dff03900",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/latch-slide.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/latch-slide.wav",
+      "sha256": "dcfe8c9b398b7af0d2a5b5cd25f1d18952a08e49722bbcbc46b62a8e380e7be0",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/latch-click.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/latch-click.wav",
+      "sha256": "d6694f939550e322e0db48cf7ccf633cb81052d1cb38708a66dc8d93ba64676d",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/latch-rattle.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/latch-rattle.wav",
+      "sha256": "95c938983bb79c5b5cda0ad57853f3e2535996d13170accdde955ffb1f60a2ba",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/breath-near.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/breath-near.wav",
+      "sha256": "4aceed8dcfd26a5cdc07d42958563b5170a9e8b904d754f6589b48db79303cfb",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/switch-click.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/switch-click.wav",
+      "sha256": "648e3c90011269303264ad48305a9a3ad2f07cc6df81e5f0090d46b86f91abbc",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/lamp-hum-loop.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/lamp-hum-loop.wav",
+      "sha256": "b5e0b5c430af5e6537bca5890d0f68e8f5266cd307908d167554ffb239ca3f1a",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/wedge-in.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/wedge-in.wav",
+      "sha256": "d890c8226e17490b897e0546a769faaad5838558696668642f3acebed9927767",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/wedge-slip.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/wedge-slip.wav",
+      "sha256": "bc0fb020c481e44e1b23d8afc2cd6c06060ee5c4d0e609fc00ce333b6e28f1c2",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/wedge-out.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/wedge-out.wav",
+      "sha256": "7aa357cd22eb49c170965320f052d556c804a705ea278e17cbb090ce8a9d942f",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/door-scrape.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/door-scrape.wav",
+      "sha256": "f7ad1019f75e2cc121de9ff5a0a8eaf2c0302b33bb4fbd912ab3a7a5ce25321b",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/mimic-response.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/mimic-response.wav",
+      "sha256": "f425cf07dcb6daf5a5f988a946a0c7eaa5c42788c15aa04a9e79155a2281732e",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/drawer-slide.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/drawer-slide.wav",
+      "sha256": "55a1aa4446bcf11f6937f71e837b8d4c03adf3babbf6cdb2ea8e3f1e008af20a",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/drawer-creak-loop.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/drawer-creak-loop.wav",
+      "sha256": "f031948760296c8b535385020385e85a45ad3fe4a20e9d7f59fef486e7cd9b5c",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/drawer-thud.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/drawer-thud.wav",
+      "sha256": "16e8a555e1dcf339923b853a77e7231a9f97ed11fab3d55ec3534f4853b39854",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/rear-floor-creak.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/rear-floor-creak.wav",
+      "sha256": "8b3237252a5a78146f38fa649193f06f783829df2b2215fc5a45236fa5e6bf21",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    },
+    {
+      "file": "dist/horror/assets/audio/knock-wood.wav",
+      "derived_from": "asset-packs/door-horror-gimmicks-v1/audio/knock-wood.wav",
+      "sha256": "6f4df698d19a7d5f8639205fd5e9ca1328e7ac78c364ccc44b832f04a4f4b15c",
+      "processing": "byte-identical copy",
+      "source": "original procedural Foley; tools/build_audio.py, fixed seeds; not a field recording"
+    }
+  ],
+  "h4_note": "H4 runtime derivatives of the H3 asset pack (images generated with the built-in image tool, prompts in the pack provenance; audio is original procedural Foley from the pack tools). Recorded 2026-10-25 by Claude."
 }

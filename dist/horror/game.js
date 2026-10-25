@@ -1,165 +1,478 @@
 (function () {
   'use strict';
-  const $ = id => document.getElementById(id), model = new DoorNight();
-  const scene = $('scene'), handle = $('handle');
-  const text = {
-    learn: ['방 안', '아래층에서는 TV 소리가 희미하게 들립니다.', '손잡이를 누른 채 왼쪽으로, 조금만 열어보세요.'],
-    knock1: ['아래층', '쿵. 쿵. 쿵. — 아래에서 천장을 두드립니다.', '손을 멈추세요. TV 소리가 돌아올 때까지.'],
-    open1: ['아래층', '다시 TV 소리가 들립니다. 잠잠해졌습니다.', '조금 더 열어서, 문 너머를 확인하세요.'],
-    hand1: ['문틈', '나무를 긁는 소리. 손끝이 들어옵니다.', '손잡이를 잡고 오른쪽으로 밀어 준비하세요.'],
-    recover: ['문밖', '문 바로 뒤에서 무언가 긁다가 멎었습니다.', '잠깐 숨을 고르세요.'],
-    reopen: ['문밖', '…아직, 문 바로 뒤에 숨소리가 남아 있습니다.', '다시 한 번만. 손잡이를 왼쪽으로 밀어 확인하세요.'],
-    knock2: ['아래층', '또다시, 아래에서 천장을 두드립니다.', '일단 멈추세요. 문틈도 지켜보세요.'],
-    settle: ['아래층', '쾅. 아래층에서 의자를 끄는 소리가 납니다.', '이제 움직이지 마세요. 잠잠해질 때까지.'],
-    finish: ['방 안', 'TV 소리가 돌아왔습니다. 손잡이를 놓습니다.', '문을 닫은 채, 잠깐 기다리세요.']
-  };
-  let pointer = null, lastPointerX = 0, lastFrame = 0, audio = null, muted = false;
-  let lastSpeech = '', lastState = '', resultAge = 0, assetsReady = false;
+  const T = window.DoorTuning, C = window.DoorCaptions;
+  const $ = id => document.getElementById(id);
+  const night = new window.DoorNight();
+  const scene = $('scene'), stage = $('stage'), front = $('front'), rear = $('rear');
+  const handle = $('handle'), boltHit = $('boltHit'), switchHit = $('switchHit'), slipperHit = $('slipperHit');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function geometry() {
-    const r = scene.getBoundingClientRect();
-    // Match the artwork's explicit narrow-screen framing, not the outer box.
-    const narrow = matchMedia('(max-width: 600px)').matches;
-    return { width: r.width * (narrow ? 2.22222 : 1), offset: narrow ? -.81 * r.width : 0 };
+  const narrowQuery = matchMedia('(max-width: 600px)');
+  // Per-layout windows into the 1600x900 world (spec section 3). Rendering and hit-testing share them.
+  // "lean" is a view-only 1.5x lean toward the bolt during the latch beats, so the small hardware reads.
+  const VIEWS = {
+    wide: { front: [0, 0, 1600, 900], down: [470, 319, 1032, 581], rear: [0, 0, 1600, 900], lean: [533, 300, 1067, 600] },
+    narrow: { front: [583, 0, 720, 900], down: [752, 319, 464, 581], rear: [322, 0, 720, 900], lean: [910, 300, 480, 600] }
+  };
+  let lean = 0, lastRawDt = 0, keyTravel = 0, rmbPrev = false;
+  const cam = { front: VIEWS.wide.front, rear: VIEWS.wide.rear, W: 1, H: 1 };
+  let audio = null, audioFiles = null, muted = false, assetsReady = false, lastFrame = 0, resultAge = 0, lastState = '', lastBeat = '';
+  let gazeMode = 'hold', rmbHeld = false, gazeLatched = false, showNumbers = false;
+  const drag = { handle: null, bolt: null, x: 0, y: 0 };
+  let captionQueue = [], caption = null, lastLine = '', marks = { floor: -9, glass: -9, palm: -9, pop: -9 }, wedgeAnim = { from: 'rest', at: -9 };
+
+  // ---- camera ------------------------------------------------------------------------------
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const smooth = t => t * t * (3 - 2 * t);
+  function layoutCamera(s) {
+    const r = stage.getBoundingClientRect(), set = narrowQuery.matches ? VIEWS.narrow : VIEWS.wide, g = s ? (reduced ? (s.gazeDown ? 1 : 0) : smooth(s.gaze)) : 0;
+    cam.W = r.width; cam.H = r.height; cam.layout = narrowQuery.matches ? 'narrow' : 'wide';
+    const l = smooth(lean), leaned = set.front.map((v, i) => lerp(v, set.lean[i], l));
+    cam.front = leaned.map((v, i) => lerp(v, set.down[i], g)); cam.rear = set.rear; cam.base = set.front;
+    front.setAttribute('viewBox', cam.front.map(v => v.toFixed(2)).join(' '));
+    rear.setAttribute('viewBox', cam.rear.join(' '));
   }
-  function release() {
-    model.release(); scene.classList.remove('dragging');
-    if (pointer !== null && handle.hasPointerCapture(pointer)) handle.releasePointerCapture(pointer);
-    pointer = null;
+  function scaleOf(box) { return Math.max(cam.W / box[2], cam.H / box[3]); }
+  function toStage(wx, wy, box = cam.front) {
+    const s = scaleOf(box);
+    return { x: (wx - box[0]) * s + (cam.W - box[2] * s) / 2, y: (wy - box[1]) * s + (cam.H - box[3] * s) / 2, s };
   }
+  function place(el, wx, wy, ww, wh, min = 44) {
+    const p = toStage(wx, wy), w = Math.max(min, ww * p.s), h = Math.max(min, wh * p.s);
+    el.style.left = `${p.x}px`; el.style.top = `${p.y}px`; el.style.width = `${w}px`; el.style.height = `${h}px`;
+  }
+
+  // ---- audio ---------------------------------------------------------------------------------
   function initAudio() {
-    try { if (!audio) audio = new RoomSound(); audio.sync(muted, model.paused); }
+    try { if (!audio) audio = new window.RoomSound(audioFiles); audio.sync(muted, night.paused); }
     catch { muted = true; $('sound').textContent = '소리 지원 안 됨'; $('sound').disabled = true; }
   }
-  function start() {
+
+  // ---- input: handle (left button) -------------------------------------------------------------
+  function gazeInput() { night.setGaze(rmbHeld || gazeLatched); }
+  function releaseHandle() {
+    if (drag.handle !== null && handle.hasPointerCapture(drag.handle)) handle.releasePointerCapture(drag.handle);
+    drag.handle = null; night.letGo(); scene.classList.remove('dragging');
+  }
+  function releaseBolt() {
+    if (drag.bolt !== null && boltHit.hasPointerCapture(drag.bolt)) boltHit.releasePointerCapture(drag.bolt);
+    drag.bolt = null; night.releaseBolt(); scene.classList.remove('latching');
+  }
+  function readButtons(event) {
+    // A right press while the left is held arrives only as a pointermove with buttons = 3 (no pointerdown).
+    if (event.pointerType !== 'mouse') return;
+    const right = (event.buttons & 2) === 2;
+    if (gazeMode === 'hold') { if (right !== rmbHeld) { rmbHeld = right; gazeInput(); } }
+    else if (right && !rmbPrev && event.type === 'pointermove') { gazeLatched = !gazeLatched; gazeInput(); }
+    rmbPrev = right;
+  }
+  function startHandle(event) {
+    if (drag.handle !== null || !night.grip()) return;
+    event.preventDefault(); drag.handle = event.pointerId; drag.x = event.clientX;
+    handle.setPointerCapture(event.pointerId); scene.classList.add('dragging');
+  }
+  handle.addEventListener('pointerdown', event => { readButtons(event); if (event.button === 0) startHandle(event); });
+  handle.addEventListener('pointermove', event => {
+    if (event.pointerId !== drag.handle) return;
+    const dx = event.clientX - drag.x; drag.x = event.clientX;
+    // Door travel follows the cursor at the current zoom; force uses unzoomed travel so it feels like H2.
+    const now = scaleOf(cam.front), base = scaleOf(cam.base), travel = T.door.travel;
+    night.drag(-dx / (now * travel), -dx / (base * travel));
+  });
+  const endHandle = event => { if (event.pointerId === drag.handle && (event.type !== 'pointerup' || event.button === 0)) releaseHandle(); };
+  handle.addEventListener('pointerup', endHandle); handle.addEventListener('pointercancel', endHandle);
+  handle.addEventListener('lostpointercapture', event => { if (event.pointerId === drag.handle) { drag.handle = null; night.letGo(); scene.classList.remove('dragging'); } });
+  handle.addEventListener('keydown', event => {
+    if (event.key === 'Enter') { event.preventDefault(); if (night.held) night.letGo(); else night.grip(); return; }
+    if (event.key === ' ') { event.preventDefault(); night.letGo(); return; }
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    event.preventDefault(); if (!night.held && !night.grip()) return;
+    const sign = event.key === 'ArrowLeft' ? 1 : -1;
+    if (night.gripping()) night.drag(0, sign * .11 / T.hand.forceGain); else keyTravel += sign * .02;
+  });
+
+  // ---- input: bolt ------------------------------------------------------------------------------
+  function boltTravel() { return Math.max(96, cam.H * .2); }
+  function startBolt(event) {
+    if (drag.bolt !== null || !night.grabBolt()) return;
+    event.preventDefault(); drag.bolt = event.pointerId; drag.y = event.clientY;
+    boltHit.setPointerCapture(event.pointerId); scene.classList.add('latching');
+  }
+  boltHit.addEventListener('pointerdown', event => { if (event.button === 0) startBolt(event); });
+  boltHit.addEventListener('pointermove', event => {
+    if (event.pointerId !== drag.bolt) return;
+    const dy = event.clientY - drag.y; drag.y = event.clientY; night.dragBolt(dy / boltTravel());
+  });
+  const endBolt = event => { if (event.pointerId === drag.bolt) releaseBolt(); };
+  boltHit.addEventListener('pointerup', endBolt); boltHit.addEventListener('pointercancel', endBolt);
+  boltHit.addEventListener('lostpointercapture', event => { if (event.pointerId === drag.bolt) { drag.bolt = null; night.releaseBolt(); scene.classList.remove('latching'); } });
+  boltHit.addEventListener('keydown', event => {
+    if (!['ArrowUp', 'ArrowDown'].includes(event.key)) return;
+    event.preventDefault(); if (!night.boltHeld && !night.grabBolt()) return;
+    const down = event.key === 'ArrowDown', step = night.b > T.bolt.detent + 1e-6 || (down && night.b >= T.bolt.detent - 1e-6) ? .025 : .05;
+    night.dragBolt(event.key === 'ArrowDown' ? step : -step);
+  });
+  boltHit.addEventListener('keyup', event => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) setTimeout(() => night.releaseBolt(), 60); });
+
+  // ---- input: right button gaze, clicks, keys ------------------------------------------------------
+  scene.addEventListener('contextmenu', event => event.preventDefault());
+  scene.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'mouse' || event.button !== 2) return;
+    event.preventDefault();
+    rmbPrev = true;
+    if (gazeMode === 'hold') { rmbHeld = true; gazeInput(); } else { gazeLatched = !gazeLatched; gazeInput(); }
+  });
+  // With the right button already held (looking down), a left press or release arrives only as a
+  // chorded pointermove (button 0, buttons changed) — no pointerdown/pointerup and no click. Route it.
+  const CHORD_TARGETS = '#handle, #boltHit, #slipperHit, #switchHit, #switchProxy, #turn, #gazeToggle';
+  document.addEventListener('pointermove', event => {
+    readButtons(event);
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    if ((event.buttons & 1) === 1) {
+      if (drag.handle !== null || drag.bolt !== null) return;
+      const hit = document.elementFromPoint(event.clientX, event.clientY), target = hit && hit.closest(CHORD_TARGETS);
+      if (!target || target.disabled) return;
+      if (target === handle) startHandle(event); else if (target === boltHit) startBolt(event); else target.click();
+    } else {
+      if (event.pointerId === drag.handle) releaseHandle();
+      if (event.pointerId === drag.bolt) releaseBolt();
+    }
+  }, true);
+  document.addEventListener('pointerup', event => {
+    if (event.pointerType === 'mouse' && event.button === 2 && gazeMode === 'hold') { rmbHeld = false; gazeInput(); }
+  }, true);
+  // Fallback for browsers that do not report chorded presses as pointer events.
+  document.addEventListener('mouseup', event => { if (event.button === 2 && gazeMode === 'hold' && rmbHeld) { rmbHeld = false; gazeInput(); } }, true);
+  switchHit.addEventListener('click', () => night.toggleLight());
+  $('switchProxy').addEventListener('click', () => night.toggleLight());
+  slipperHit.addEventListener('click', () => night.toggleWedge());
+  $('turn').addEventListener('click', () => night.setTurn(!night.wantRear));
+  $('gazeToggle').addEventListener('click', () => { gazeLatched = !gazeLatched; gazeInput(); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); if (!event.repeat) pause(!night.paused); return; }
+    if (event.target && ['INPUT'].includes(event.target.tagName)) return;
+    if (event.repeat && event.code !== 'KeyS') return;
+    if (event.code === 'KeyM') toggleMute();
+    else if (!night.active()) return;
+    else if (event.code === 'KeyQ') night.setTurn(!night.wantRear);
+    else if (event.code === 'KeyL') night.toggleLight();
+    else if (event.code === 'KeyW') night.toggleWedge();
+    else if (event.code === 'KeyS' && !event.repeat) { gazeLatched = !gazeLatched; gazeInput(); }
+  });
+
+  // ---- lifecycle --------------------------------------------------------------------------------
+  function resetInput() { releaseHandle(); releaseBolt(); rmbHeld = false; gazeLatched = false; }
+  function begin(checkpoint) {
     if (!assetsReady) return;
-    release(); if (audio) audio.stopVoices(); model.start(); initAudio(); lastFrame = performance.now();
+    resetInput(); if (audio) audio.stopAll();
+    // ?cp=C5 starts at a checkpoint for captures and debugging only; it is never PASS evidence.
+    const debugStart = new URLSearchParams(location.search).get('cp');
+    if (checkpoint === 'retry') night.retry(); else night.start(debugStart && !begin.used ? debugStart : 'P0', true);
+    begin.used = true;
+    initAudio(); lastFrame = performance.now(); caption = null; captionQueue = []; lastLine = ''; resultAge = 0; lastState = ''; lastBeat = ''; keyTravel = 0;
+    marks = { floor: -9, glass: -9, palm: -9, pop: -9 };
     $('intro').hidden = true; $('end').hidden = true; $('pauseLayer').hidden = true;
-    $('pause').disabled = false; $('restart').disabled = false; handle.disabled = false;
-    $('pause').textContent = '일시정지';
-    scene.classList.add('playing'); scene.classList.remove('failure'); lastState = ''; resultAge = 0;
-    render(); handle.focus({ preventScroll: true });
+    $('pause').disabled = false; $('restart').disabled = false; $('pause').textContent = '일시정지';
+    scene.classList.add('playing'); scene.dataset.end = '';
+    render(); setTimeout(() => (night.beat === 'P0' ? boltHit : handle).focus({ preventScroll: true }), 0);
   }
   function pause(value) {
-    if (model.state !== 'playing') return;
-    release(); model.setPaused(value); $('pauseLayer').hidden = !value;
+    if (night.state !== 'playing' || night.paused === value) return;
+    resetInput(); night.setPaused(value); $('pauseLayer').hidden = !value;
     $('pause').textContent = value ? '이어서 하기' : '일시정지';
     if (audio) audio.sync(muted, value);
     if (value) $('resume').focus({ preventScroll: true });
     else { initAudio(); lastFrame = performance.now(); handle.focus({ preventScroll: true }); }
     render();
   }
-  handle.addEventListener('pointerdown', event => {
-    if (event.button !== 0 || pointer !== null || !model.begin()) return;
-    event.preventDefault(); pointer = event.pointerId; lastPointerX = event.clientX;
-    handle.setPointerCapture(pointer); scene.classList.add('dragging');
-  });
-  handle.addEventListener('pointermove', event => {
-    if (event.pointerId !== pointer) return;
-    const travel = geometry().width * 440 / 1600;
-    const dx = event.clientX - lastPointerX; lastPointerX = event.clientX;
-    model.drag(dx / travel); render();
-  });
-  handle.addEventListener('pointerup', release); handle.addEventListener('pointercancel', release);
-  handle.addEventListener('lostpointercapture', () => { pointer = null; model.release(); scene.classList.remove('dragging'); });
-  handle.addEventListener('keydown', event => {
-    if (event.key === ' ') { event.preventDefault(); release(); return; }
-    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-    event.preventDefault(); if (!model.begin()) return;
-    model.drag(event.key === 'ArrowRight' ? .04 : -.04);
-    if (!model.hand || model.handStage === 'released') model.release();
-    render();
-  });
-  $('start').addEventListener('click', start); $('again').addEventListener('click', start); $('restart').addEventListener('click', start);
-  $('pause').addEventListener('click', () => pause(!model.paused)); $('resume').addEventListener('click', () => pause(false));
-  $('sound').addEventListener('click', () => {
+  function toggleMute() {
     muted = !muted; initAudio(); $('sound').textContent = muted ? '소리 꺼짐' : '소리 켜짐';
-    $('sound').setAttribute('aria-pressed', String(!muted));
-    if (audio) audio.sync(muted, model.paused);
-  });
-  document.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); pause(!model.paused); } });
+    $('sound').setAttribute('aria-pressed', String(!muted)); if (audio) audio.sync(muted, night.paused);
+  }
+  $('start').addEventListener('click', () => begin('start'));
+  $('again').addEventListener('click', () => begin('start'));
+  $('restart').addEventListener('click', () => begin('start'));
+  $('retry').addEventListener('click', () => begin('retry'));
+  $('pause').addEventListener('click', () => pause(!night.paused));
+  $('resume').addEventListener('click', () => pause(false));
+  $('sound').addEventListener('click', toggleMute);
+  const setGazeMode = toggle => { gazeMode = toggle ? 'toggle' : 'hold'; $('gazeMode').checked = toggle; $('gazeModeIntro').checked = toggle; rmbHeld = false; gazeInput(); };
+  $('gazeMode').addEventListener('change', e => setGazeMode(e.target.checked));
+  $('gazeModeIntro').addEventListener('change', e => setGazeMode(e.target.checked));
+  $('showNumbers').addEventListener('change', e => { showNumbers = e.target.checked; });
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause(true); });
-  window.addEventListener('blur', () => pause(true)); window.addEventListener('resize', () => { if (model.active() && model.hand) pause(true); else release(); render(); });
-  function end() {
-    release(); handle.disabled = true; $('pause').disabled = true;
-    const won = model.state === 'won', strain = model.reason === 'strain';
-    $('endTitle').textContent = won ? '이제 좀 조용하네.' : strain ? '그 소리를 들었다.' : model.reason === 'hand' ? '문이 밀려 열렸다.' : '아랫집이 올라왔다.';
-    $('endCopy').textContent = won ? '문은 닫혔습니다.\n그 말은, 아래에서 들린 게 아니었습니다.' : strain ? '너무 세게 미는 동안 문이 크게 삐걱거렸습니다.\n손이 잠잠해지면, 잡은 채 왼쪽으로 힘을 줄이세요.' : model.reason === 'hand' ? '손잡이를 잡고 오른쪽으로 밀어 버티세요.\n손가락이 굳으면 더 밀고, 문이 울면 힘을 줄이세요.' : '노크가 들릴 때 문을 움직였습니다.\n손이 없다면, TV 소리가 돌아올 때까지 기다리세요.';
-    $('end').classList.toggle('lost', !won); $('end').hidden = false;
-    scene.classList.toggle('failure', !won); $('again').focus({ preventScroll: true });
-  }
-  function handSpeech() {
-    if (model.handStage === 'approach') return ['문틈', '손톱이 나무를 긁는다. 손끝이 틈으로 들어온다.', '손잡이를 잡은 채 오른쪽으로 밀어 준비하세요.'];
-    if (model.handStage === 'retreat') return ['문틈', '붙잡던 손가락이, 하나씩 미끄러집니다.', '힘을 풀어도 됩니다. 손이 빠지면 문을 닫으세요.'];
-    if (model.handStage === 'released') return ['문틈', '손이 빠졌다. 지금이다.', '이제 손잡이를 오른쪽으로, 끝까지 닫으세요.'];
-    if (model.gripNoise > .52) return ['아래층', '문이 운다. 아래에서 다시, 쿵.', '잡은 채 왼쪽으로 힘을 줄이세요. 놓지는 마세요.'];
-    if (model.gripStage === 'push') return ['문틈', '손이 문을 밀어 벌린다.', '오른쪽으로 더 밀어 버티세요.'];
-    if (model.gripStage === 'ease') return ['문틈', '손의 힘이 잠깐 느슨해졌습니다.', '잡은 채 왼쪽으로 조금. 문이 울지 않게 힘을 줄이세요.'];
-    return ['문틈', '손가락이 굳는다. 다시 밀쳐오려 한다.', '손잡이를 잡고 오른쪽으로, 힘을 실으세요.'];
-  }
-  function render() {
-    const g = geometry(), width = scene.getBoundingClientRect().width;
-    const ending = model.state === 'lost' && resultAge < .95;
-    const contactShake = reduced ? 0 : Math.sin(model.time * 87) * model.contact * 2;
-    const strainShake = reduced ? 0 : Math.sin(model.time * 63) * model.gripNoise * 1.7;
-    const impactShake = reduced ? 0 : model.impact * Math.sin(model.time * 104) * 2.5;
-    const visualOpen = ending && model.reason === 'hand' ? Math.min(1, model.opening + resultAge * .45) : model.opening;
-    const edge = 1188 - 440 * visualOpen;
-    $('doorLayer').setAttribute('transform', `translate(${-440 * visualOpen + contactShake + strainShake} 0)`);
-    const camera = `translate(0, ${impactShake}px)`;
-    $('world').style.transform = camera; scene.querySelector('.apartment').style.transform = camera;
-    handle.style.left = `${g.offset + g.width * (1158 - 440 * model.opening + contactShake + strainShake) / 1600}px`;
-    $('handleHint').style.left = `${Math.max(12, Math.min(width - 190, g.offset + g.width * (1010 - 440 * model.opening) / 1600))}px`;
-    const approach = Math.min(1, model.handAge / DoorNight.RULES.approach);
-    const retreat = model.handStage === 'retreat' ? Math.min(1, model.retreatTime / .7) : 0;
-    const visible = model.hand && model.handStage !== 'released';
-    const grip = visible && model.handStage !== 'approach';
-    $('hand').setAttribute('opacity', visible && !grip ? String(Math.min(1, approach * 2)) : '0');
-    $('hand').setAttribute('x', String(1190 + (edge - 1225) * Math.sin(approach * Math.PI / 2)));
-    $('hand').setAttribute('y', String(420 + (1 - approach) * 75));
-    $('handGrip').setAttribute('opacity', grip ? String(1 - retreat) : '0');
-    $('handGrip').setAttribute('x', String(edge - 48 + retreat * 265 + contactShake));
-    $('handGrip').setAttribute('y', String(405 + (reduced ? 0 : Math.sin(model.gripTime * 4) * (model.gripStage === 'push' ? 3 : 1))));
-    $('corridorShade').setAttribute('opacity', visible ? '.25' : '.08');
-    const floorSignal = (model.knock && model.knockAge >= DoorNight.RULES.knockLead) || (model.noiseWarned && model.gripNoise > .45);
-    $('knockMark').setAttribute('opacity', floorSignal ? String(.25 + model.impact * .75) : '0');
-    scene.classList.toggle('knocking', model.knock); scene.classList.toggle('gripped', grip);
-    scene.classList.toggle('danger', model.gripNoise > .5 || model.violation > .07);
-    scene.dataset.phase = model.phase; scene.dataset.hand = model.handStage; scene.dataset.grip = model.gripStage;
-    scene.dataset.defended = String(model.defended); scene.dataset.force = model.force.toFixed(3);
-    let speech = text[model.phase] || text.learn;
-    if (model.knock && model.knockAge < DoorNight.RULES.knockLead && !model.hand) speech = ['아래층', '…TV 소리가 뚝, 끊겼습니다.', '누군가, 소리를 듣고 있습니다.'];
-    if (model.hand) speech = handSpeech();
-    const key = speech.join('|');
-    if (key !== lastSpeech) { $('location').textContent = speech[0]; $('subtitle').textContent = speech[1]; $('instruction').textContent = speech[2]; lastSpeech = key; }
-    $('forceFeedback').hidden = !model.active() || !model.hand || model.handStage === 'released';
-    const easing = model.gripStage === 'ease';
-    $('forceBand').style.left = easing ? '16%' : '74%'; $('forceBand').style.width = easing ? '32%' : '22%';
-    $('forceFill').style.transform = `scaleX(${model.force})`;
-    $('forceFeedback').classList.toggle('too-loud', model.gripNoise > .45);
-    $('forceCue').textContent = model.resumeGrace > 0 ? '손잡이를 다시 잡으세요' : model.handStage === 'retreat' ? '손이 빠진다 — 닫을 준비' : !model.held ? '손잡이를 잡고 → 밀기' : model.gripNoise > .52 ? '문이 운다 — ← 힘 줄이기' : easing ? '손이 느슨하다 — ← 힘 줄이기' : model.gripStage === 'push' ? '밀쳐온다 — → 더 밀기' : '손가락이 굳는다 — 밀 준비';
-    $('handleHint').textContent = model.hand ? model.handStage === 'released' ? '오른쪽으로 → 닫기' : '누른 채 → 밀기 / ← 힘 빼기' : model.knock ? '움직이지 마세요' : ['recover', 'finish'].includes(model.phase) ? '손잡이를 놓으세요' : '누른 채 ← 열기';
-    $('handleHint').hidden = !model.active(); handle.disabled = !model.active();
-    $('objective').textContent = model.state === 'won' ? '문 너머 확인하기 — 완료' : model.knocksPassed ? '붙잡힌 문을 지키고, 닫으세요.' : '문 너머를 확인하고, 무사히 닫으세요.';
-    if (model.state !== lastState) {
-      lastState = model.state; resultAge = 0;
-      if (['won', 'lost'].includes(model.state)) { release(); $('pause').disabled = true; }
+  window.addEventListener('blur', () => pause(true));
+  window.addEventListener('resize', () => { if (night.active() && (night.hand || night.eyes !== 'none' || night.mimic !== 'none' || night.drawer === 'open' || night.shoves)) pause(true); else resetInput(); render(); });
+
+  // ---- end card -----------------------------------------------------------------------------------
+  function showEnd() {
+    const won = night.state === 'won', end = C.ENDINGS[night.reason];
+    let title, copy, hint = '';
+    if (won) { title = C.WIN.title; copy = C.WIN.copy; }
+    else {
+      title = Array.isArray(end.title) ? end.title[night.glassBeat() ? 1 : 0] : end.title;
+      copy = typeof end.lesson === 'string' ? end.lesson : end.lesson[night.lastSource] || end.lesson.scrape;
+      if (night.reason === 'noise' && night.lastSource === 'rattle' && night.beat === 'P0') copy = C.ENDINGS.noise.lesson.rattleUp;
+      if (night.reason === 'hand' && night.failWhy === 'timeout') { title = C.ENDINGS.hand.timeoutTitle; copy = C.ENDINGS.hand.timeoutLesson; }
+      if (night.reason === 'eyes' && gazeMode === 'toggle') copy = C.ENDINGS.eyes.lessonToggle;
+      if (night.reason === 'drawer' && night.beat === 'C6c') copy = '문이 밀리는 중이면, 슬리퍼를 먼저 끼우고 뒤를 보세요.';
+      if (night.failCounts[night.beat] >= 2) hint = end.hint;
     }
-    if (['won', 'lost'].includes(model.state) && resultAge >= .95 && $('end').hidden) end();
+    $('endTitle').textContent = title; $('endCopy').textContent = copy;
+    $('endHint').textContent = hint; $('endHint').hidden = !hint;
+    $('end').classList.toggle('lost', !won); $('end').classList.toggle('won', won); $('end').hidden = false;
+    scene.dataset.end = won ? 'win' : night.reason;
+    (won ? $('again') : $('retry')).focus({ preventScroll: true });
   }
-  function frame(now) {
-    const dt = lastFrame ? Math.min(.08, (now - lastFrame) / 1000) : 0; lastFrame = now;
-    model.update(dt); if (['won', 'lost'].includes(model.state)) resultAge += dt;
-    const events = model.events.splice(0);
-    if (audio) { for (const event of events) audio.event(event); audio.update(model); }
+
+  // ---- events: sound twins and captions --------------------------------------------------------------
+  function handleEvents(events) {
+    for (const e of events) {
+      const twin = C.EVENTS[e.type];
+      if (audio && twin && twin.sound) audio.cue(e, twin.sound);
+      if (e.type === 'warning') marks[e.glass ? 'glass' : 'floor'] = night.time;
+      if (['glass-knock', 'loiter-tap', 'soft-knock'].includes(e.type)) marks.glass = night.time;
+      if (['palm', 'palm-slap'].includes(e.type)) marks.palm = night.time;
+      if (e.type === 'wedge-pop') marks.pop = night.time;
+      if (['wedge-inserting', 'wedge-removing'].includes(e.type)) wedgeAnim = { from: e.type, at: night.time };
+      if (!twin || !twin.text) continue;
+      let loc = twin.loc, text = twin.text;
+      if (e.type === 'warning') { loc = e.glass ? '문 유리' : '아래층'; text = (e.glass ? '똑. 똑. 똑.' : '쿵. 쿵. 쿵.') + (e.source === 'light' ? ' — 문틈으로 빛이 샌다. 불을 끄세요 (스위치 · L).' : ' — 소리 내지 마세요 (긁힘·스위치·슬리퍼·걸쇠).'); }
+      if (e.type === 'push-defended') text = `버텼다 (${Math.min(e.count, T.hand.required)}/${T.hand.required}).`;
+      if (e.type === 'wedge-refused') text = { shove: '미는 중에는 못 끼운다 — 밀고 난 직후에.', hand: '손잡이를 놓아야 슬리퍼를 끼울 수 있다.', range: '문이 조금 열려 있을 때만 끼울 수 있다.' }[e.reason] || text;
+      if (e.type === 'cover-ending' && night.sources.some(x => x.src === 'traffic')) loc = '창밖';
+      if (e.type === 'mask-start' && night.beat === 'C5' && !handleEvents.c5Mask) { handleEvents.c5Mask = true; loc = '복도 밖'; text = '윙— 엘리베이터. 긁힘만 가린다 — 손가락은 그대로다.'; }
+      if (e.type === 'confirm' && e.route === 'lit') text = '불빛에 — 유리 너머, 누군가 서 있었다. 현관은 반쯤 열려 있다.';
+      if (e.type === 'wedge-slip') text = e.level >= 2 ? '끼익 — 슬리퍼가 빠지려 한다 (2/3).' : '끽 — 슬리퍼가 밀렸다 (1/3).';
+      if (e.type === 'glass-knock') text = e.slow ? '똑…… 똑…… 똑.' : ['똑.', '똑. 똑.', '똑. 똑. 똑.'][e.index] || '똑.';
+      if (e.type === 'shove' && e.result === 'held') text = '쿵 — 버텼다.';
+      if (e.type === 'shove' && e.result === 'open') text = '쿵 — 문이 밀려 열렸다!';
+      if (e.type === 'shove' && e.result === 'wedge') continue;
+      if (e.type === 'covered' && e.source === 'switch') text = '스위치 소리가 바깥 소리에 묻혔다.';
+      if (e.type === 'breath' && e.visit === 'F3') { loc = '문 너머'; text = '…숨소리가 문 바로 뒤에.'; }
+      const priority = C.PRIORITY[e.type] || 2;
+      captionQueue = captionQueue.filter(c => c.priority >= priority || c.shownAt);
+      captionQueue.push({ loc, text, priority, hold: Math.max(2200, text.length * 85), at: performance.now() });
+      captionQueue.sort((a, b) => b.priority - a.priority);
+    }
+  }
+
+  // ---- render -------------------------------------------------------------------------------------------
+  const attr = (el, k, v) => el.setAttribute(k, typeof v === 'number' ? (Math.round(v * 100) / 100).toString() : v);
+  function render() {
+    const s = night.snapshot(), now = performance.now(), t = night.time;
+    layoutCamera(s);
+    const edgeHand = 1188 - 440 * s.o, edge = T.door.edgeX - 440 * s.o;
+    const shakeOK = !reduced;
+    const contact = shakeOK ? Math.sin(t * 87) * s.contact * 2 : 0, strainShake = shakeOK ? Math.sin(t * 63) * (s.hand ? s.strain : 0) * 1.7 : 0;
+    const tremble = shakeOK && s.holder === 'unseated012' ? Math.sin(t * 2 * Math.PI * 7) * .4 : 0;
+    const impact = shakeOK ? s.impact * Math.sin(t * 104) * 3 : 0;
+    stage.style.transform = impact ? `translate(0, ${impact.toFixed(2)}px)` : '';
+    // Turning: a pan over the shoulder (crossfade only under reduced motion).
+    const turn = smooth(s.turn);
+    front.style.opacity = String(1 - turn); rear.style.opacity = String(turn); rear.style.visibility = s.turn > 0 ? 'visible' : 'hidden';
+    front.style.transform = reduced ? '' : `translateX(${(turn * 55).toFixed(2)}%)`;
+    rear.style.transform = reduced ? '' : `translateX(${(-(1 - turn) * 55).toFixed(2)}%)`;
+    scene.dataset.view = s.turn >= .5 ? 'rear' : s.gaze >= .5 ? 'down' : 'front';
+    // Room light changes plates and brightness only.
+    attr($('litPlate'), 'opacity', s.lit);
+    $('doorGroup').style.filter = `brightness(${(.85 + .15 * s.lit).toFixed(3)})`;
+    attr($('corridorShade'), 'opacity', s.corridorShade);
+    attr($('ajarStrip'), 'opacity', s.revealed ? .32 : 0); attr($('stairStrip'), 'opacity', s.revealed ? .5 : 0);
+    const eyesOn = s.eyes === 'open' || s.eyes === 'withdraw';
+    attr($('eyes'), 'opacity', eyesOn ? s.eyesFade : 0);
+    $('eyesImage').style.filter = `brightness(${(.55 + .25 * s.lit).toFixed(2)})`;
+    attr($('feetShadows'), 'opacity', s.eyes !== 'none' ? Math.max(.4, s.eyesFade) * (s.revealed ? 1 : .6) : 0);
+    attr($('doorGroup'), 'transform', `translate(${(-440 * s.o + contact + strainShake + tremble).toFixed(2)} 0)`);
+    attr($('silhouette'), 'opacity', s.silhouette * .62);
+    const palmAge = t - marks.palm;
+    attr($('palm'), 'opacity', s.light && palmAge >= 0 && palmAge < 1.6 ? .6 * (1 - palmAge / 1.6) : 0);
+    $('palm').setAttribute('transform', `translate(${(-90 * Math.min(1, Math.max(0, palmAge) / 1.2)).toFixed(1)} 0)`);
+    // Bolt: body, rod behind the collars, collars again; the guide shows while held.
+    attr($('bolt'), 'y', 552.7 + 34.5 * s.b);
+    $('latch').style.filter = `brightness(${(.45 + .55 * s.lit + (s.boltHeld ? .18 : 0)).toFixed(2)})`;
+    for (const [id, y1, y2] of [['boltGuide', 629.45, 663.95]]) { attr($(id), 'y1', y1); attr($(id), 'y2', y2); attr($(id), 'opacity', s.boltHeld ? .7 : 0); }
+    attr($('boltDetent'), 'opacity', s.boltHeld ? .9 : 0);
+    attr($('boltDetent'), 'y1', 629.45 + 34.5 * .8); attr($('boltDetent'), 'y2', 629.45 + 34.5 * .8);
+    attr($('floorHole'), 'opacity', s.lit > .5 ? .9 : .15);
+    // H2 hand sprites (kept from H2).
+    const approach = s.hand && s.handStage === 'approach' ? Math.min(1, night.handAge / T.hand.approach) : 1;
+    const retreat = s.handStage === 'retreat' ? Math.min(1, night.retreatTime / T.hand.retreat) : 0;
+    const visibleHand = s.hand && s.handStage !== 'released', grip = visibleHand && s.handStage !== 'approach';
+    attr($('hand'), 'opacity', visibleHand && !grip ? Math.min(1, approach * 2) : 0);
+    attr($('hand'), 'x', 1190 + (edgeHand - 1225) * Math.sin(approach * Math.PI / 2));
+    attr($('hand'), 'y', 420 + (1 - approach) * 75);
+    attr($('handGrip'), 'opacity', grip ? 1 - retreat : 0);
+    attr($('handGrip'), 'x', edgeHand - 48 + retreat * 265 + contact);
+    attr($('handGrip'), 'y', 405 + (reduced ? 0 : Math.sin(night.gripTime * 4) * (s.gripStage === 'push' ? 3 : 1)));
+    for (const id of ['hand', 'handGrip', 'fingerArt']) $(id).style.filter = `brightness(${(.8 + .2 * s.lit).toFixed(2)})`;
+    // G6 fingers: grip art clipped to the leading edge; pose shows each mimic state.
+    const fingerOn = s.mimic !== 'none' && !(s.mimic === 'out' && s.fingersOut >= 1);
+    let fx = 0, fy = 0, fo = fingerOn ? 1 : 0;
+    if (s.mimic === 'delay') fy = -3 - (reduced ? 0 : Math.sin(t * 40) * .8);
+    if (s.mimic === 'response') { fx = -6; fy = -5; fo = .78; }
+    if (s.mimic === 'out') { fx = 40 * s.fingersOut; fo = 1 - s.fingersOut; }
+    if (s.P >= T.mimic.pinchWarn) fy = 2;
+    attr($('fingers'), 'opacity', fo);
+    attr($('fingerClipRect'), 'x', edgeHand - 30);
+    attr($('fingerArt'), 'x', edgeHand - 48 + fx); attr($('fingerArt'), 'y', 405 + fy);
+    // G5 slipper: rest on the floor, slides under the leading edge, shows slip pose.
+    const slipper = $('slipper');
+    slipper.style.display = s.prop ? '' : 'none';
+    const rest = [1120, 823, 160, 57.2], wedged = [edge - 22.1, 736.5, 130.1, 46.5];
+    let k = s.wedge === 'in' ? 1 : s.wedge === 'inserting' ? Math.min(1, (t - wedgeAnim.at) / T.wedge.insert) : s.wedge === 'removing' ? 1 - Math.min(1, (t - wedgeAnim.at) / T.wedge.remove) : 0;
+    const popAge = t - marks.pop; if (s.wedge === 'rest' && popAge >= 0 && popAge < .4) k = 1 - popAge / .4;
+    const box = rest.map((v, i) => lerp(v, wedged[i], smooth(k)));
+    const tilt = s.wedge === 'in' ? [0, -3, -8][s.slipLevel] : 0;
+    attr(slipper, 'x', box[0] + tilt); attr(slipper, 'y', box[1] - (s.slipLevel >= 2 ? 3 : 0)); attr(slipper, 'width', box[2]); attr(slipper, 'height', box[3]);
+    slipper.setAttribute('transform', tilt ? `rotate(${tilt} ${box[0] + box[2]} ${box[1] + box[3]})` : '');
+    slipper.style.filter = `brightness(${(.62 + .38 * s.lit).toFixed(2)})`;
+    // Switch rocker and under-door light.
+    attr($('rocker'), 'y', 376.5 + (s.light ? -1.5 : 1.5));
+    $('rocker').style.filter = `brightness(${s.light ? 1.1 : .8})`;
+    $('switch').style.filter = `brightness(${(.7 + .3 * s.lit).toFixed(2)})`;
+    attr($('underDoor'), 'opacity', s.lit > .5 && s.o < .02 ? .55 : 0);
+    attr($('footGaps'), 'opacity', s.lit > .5 && s.o < .02 && (s.beat === 'F3' || s.beat === 'C7') ? 1 : 0);
+    const floorAge = t - marks.floor, glassAge = t - marks.glass;
+    attr($('floorKnock'), 'opacity', floorAge >= 0 && floorAge < 1.3 ? .9 * (1 - floorAge / 1.3) : 0);
+    attr($('glassKnock'), 'opacity', glassAge >= 0 && glassAge < .9 ? .9 * (1 - glassAge / .9) : 0);
+    $('glassKnock').setAttribute('transform', `translate(${(960 - 440 * s.o).toFixed(1)} 330)`);
+    // Rear view: the drawer panel is always composited over the empty cavity.
+    const d = s.d, dy = 44 * d, sc = 1 + .1 * d, cx = 682.9, cy = 335.8;
+    $('drawerFront').setAttribute('transform', `translate(0 ${dy.toFixed(2)}) translate(${cx} ${cy}) scale(${sc.toFixed(3)}) translate(${-cx} ${-cy})`);
+    $('drawerFront').style.filter = `brightness(${(.55 + .15 * s.lit).toFixed(2)})`;
+    $('rearPlate').style.filter = `brightness(${(1 + .25 * s.lit).toFixed(2)})`;
+    const pw = 506.5 * sc, px = cx - pw / 2, ptop = cy + dy - 89.7 * sc / 2;
+    attr($('drawerSideL'), 'points', `429.7,290.9 429.7,383.7 ${px},${ptop + 89.7 * sc} ${px},${ptop}`);
+    attr($('drawerSideR'), 'points', `935.9,290.9 935.9,383.7 ${px + pw},${ptop + 89.7 * sc} ${px + pw},${ptop}`);
+    attr($('drawerSideL'), 'opacity', d); attr($('drawerSideR'), 'opacity', d);
+    attr($('drawerFingers'), 'opacity', Math.max(0, (d - .5) * 2)); attr($('drawerFingers'), 'y', 262 + dy * .6);
+    // Screen overlays.
+    $('brow').style.opacity = String(smooth(s.gaze));
+    $('rearVignette').style.opacity = String(s.turn < .5 && s.drawer === 'open' ? Math.max(0, (s.d - .5) * 2) : 0);
+    $('fade').style.opacity = String(s.fade);
+    scene.classList.toggle('danger', s.A >= .45 || s.E >= .5 || s.strain > .5 || s.d > .66);
+    scene.classList.toggle('gripped', grip); scene.classList.toggle('held', s.held);
+    const scraping = s.band === 'stiff' && s.speed > .01 && !s.covered;
+    attr($('scuff'), 'opacity', scraping ? .65 : s.band === 'stiff' ? .3 : .12);
+    // Hotspots share the camera mapping.
+    const frontUsable = night.active() && s.turn === 0 && !s.wantRear && s.beat !== 'END';
+    const handleOK = frontUsable && (s.held || !s.boltHeld) && !(s.beat === 'C7' && night.s.pulling);
+    place(handle, T.door.handleX - 440 * s.o + contact, T.door.handleY, 62, 125, 56);
+    handle.style.minHeight = '110px'; handle.disabled = !handleOK;
+    const pulling = s.beat === 'C7' && night.s.pulling;
+    const boltBeat = ['P0', 'C7', 'F3'].includes(s.beat) && !(s.beat === 'F3' && s.seatedFlag) && !pulling;
+    place(boltHit, 1164.95 - 440 * s.o, 629.45 + 34.5 * s.b, 64, 64, narrowQuery.matches ? 48 : 44);
+    boltHit.disabled = !(frontUsable && boltBeat && !s.held);
+    boltHit.classList.toggle('cue', boltBeat && !s.boltHeld && (s.beat !== 'F3' || s.b < .79));
+    place(switchHit, 382.5, 387.5, 85, 115);
+    const switchVisible = !narrowQuery.matches;
+    switchHit.disabled = !(switchVisible && frontUsable && night.switchUnlocked() && !s.gazeDown);
+    switchHit.classList.toggle('cue', s.beat === 'C2' && s.corridor === 'dead' && !s.confirmRoute && !s.light);
+    $('switchProxy').hidden = !(narrowQuery.matches && night.state === 'playing' && night.switchUnlocked());
+    $('switchProxy').disabled = !s.canSwitch;
+    const sl = s.wedge === 'rest' ? [1105, 800, 190, 95] : [edge - 30, 728, 150, 64];
+    place(slipperHit, sl[0] + sl[2] / 2, sl[1] + sl[3] / 2, sl[2], sl[3]);
+    slipperHit.disabled = !(frontUsable && s.prop && ['C6b', 'C6c'].includes(s.beat));
+    slipperHit.classList.toggle('cue', s.canWedge && ((s.beat === 'C6b' && night.absorbed >= 1 && s.wedge === 'rest') || (s.beat === 'C6c' && !s.shoves && s.wedge === 'in')));
+    // Turn control and gaze toggle.
+    const turnBtn = $('turn');
+    turnBtn.hidden = !(night.state === 'playing' && night.turnUnlocked());
+    turnBtn.disabled = !(s.wantRear ? night.active() : s.canTurn);
+    $('turnLabel').textContent = s.wantRear ? '문' : '뒤'; turnBtn.querySelector('.arrow').textContent = s.wantRear ? '↷' : '↶';
+    turnBtn.setAttribute('aria-label', s.wantRear ? '문 쪽으로 돌아서기' : '뒤돌아보기');
+    turnBtn.classList.toggle('cue', (s.drawer === 'open' && !s.wantRear) || (s.drawer === 'shut' && s.wantRear));
+    const gazeBtn = $('gazeToggle');
+    gazeBtn.hidden = !(night.state === 'playing' && s.turn === 0 && !s.wantRear && (gazeMode === 'toggle' || ['C4', 'C5', 'C6a', 'C6b', 'C6c', 'C7', 'F1', 'F2', 'F3'].includes(s.beat)));
+    gazeBtn.setAttribute('aria-pressed', String(gazeLatched));
+    $('gazeBadge').hidden = !s.gazeDown;
+    $('leakChip').hidden = !(night.state === 'playing' && s.leak);
+    // HUD: at most two panels (force > checklist > sound).
+    const forceOn = night.active() && s.hand && s.handStage !== 'released';
+    const checkOn = night.active() && s.beat === 'F3';
+    // The force panel and the checklist never coexist, so at most two panels show.
+    const soundWanted = night.active() && (s.sources.length > 0 || s.band === 'stiff' || s.A >= .25) && s.turn < .5;
+    $('forcePanel').hidden = !forceOn; $('checklist').hidden = !checkOn; $('soundStrip').hidden = !soundWanted; scene.classList.toggle('strip', soundWanted);
+    if (forceOn) {
+      const easing = s.gripStage === 'ease';
+      $('forceBand').style.left = easing ? '16%' : '74%'; $('forceBand').style.width = easing ? '32%' : '22%';
+      $('forceFill').style.transform = `scaleX(${s.force.toFixed(3)})`;
+      $('forcePanel').classList.toggle('too-loud', s.strain > .45);
+      $('forceCue').textContent = s.resumeGrace > 0 ? '손잡이를 다시 잡으세요' : s.handStage === 'retreat' ? '손이 빠진다' : s.handStage === 'approach' ? '손이 들어온다 — 잡으세요' : !s.held ? '손잡이를 잡고 → 밀기' : s.strain > .52 ? '문이 운다 — ← 힘 줄이기' : easing ? '손이 느슨하다 — ← 힘 줄이기' : s.gripStage === 'push' ? '밀쳐온다 — → 더 밀기' : '손가락이 굳는다 — 밀 준비';
+    }
+    if (checkOn) {
+      $('ckClosed').classList.toggle('ok', s.flush && s.o <= T.door.flush); $('ckWedge').classList.toggle('ok', s.wedge === 'rest');
+      $('ckHands').classList.toggle('ok', !s.held); $('ckNoHand').classList.toggle('ok', !s.hand && s.mimic === 'none');
+      const ks = night.s.t - T.beats.f3Knocks, phase = ks < 0 ? -1 : (ks % T.beats.f3Period) / T.beats.f3Period;
+      [...$('dots').children].forEach((dot, i) => dot.classList.toggle('on', phase >= 0 && phase >= i / 3 && phase < (i + 1) / 3));
+    }
+    if (!$('soundStrip').hidden) {
+      $('maskFill').style.transform = `scaleX(${Math.min(1, s.L / 1.2).toFixed(3)})`;
+      $('soundStrip').classList.toggle('covered', s.covered); $('soundStrip').classList.toggle('ending', s.preWarn);
+      $('coverChip').textContent = s.covered ? (s.preWarn ? '곧 멎음' : '덮임') : s.sources.length ? '약함' : '조용';
+      $('attentionTrack').hidden = s.A < .25; $('attentionFill').style.transform = `scaleX(${Math.min(1, s.A).toFixed(3)})`;
+      $('soundLabel').textContent = s.A >= .25 ? '바깥 소리 · 기척' : '바깥 소리';
+    }
+    $('numbers').hidden = !(showNumbers && night.state !== 'ready');
+    if (showNumbers) $('numbers').textContent = `beat ${s.beat}  o ${s.o.toFixed(3)}  b ${s.b.toFixed(2)}\n기척 A ${s.A.toFixed(2)}  가림 L ${s.L.toFixed(2)}${s.covered ? ' ●' : ''}\n시선 E ${s.E.toFixed(2)}  끼임 P ${s.P.toFixed(3)}\n서랍 d ${s.d.toFixed(2)}  슬리퍼 ${s.slip.toFixed(1)}  힘 ${s.force.toFixed(2)}`;
+    // QA surface (read-only).
+    Object.assign(scene.dataset, { beat: s.beat, gaze: s.gazeDown ? 'down' : 'front', cover: s.covered ? 'on' : 'off', mimic: s.mimic, wedge: s.wedge,
+      latch: s.seatedFlag ? 'seated' : s.b > .02 ? 'part' : 'up', light: s.light ? 'on' : 'off', hand: s.hand ? s.handStage : 'none', grip: s.gripStage });
+    // Captions: an event line wins for a moment, the steady line otherwise.
+    const steady = C.line(s, gazeMode);
+    // Each queued line stays at least 1.2 s; higher priority lines go first; ambience lines yield.
+    if (caption && now - caption.shownAt >= 1200 && captionQueue.length) caption = null;
+    if (caption && now - caption.shownAt >= caption.hold) caption = null;
+    // Lines about a moment that has passed (older than 1.6 s, below teaching priority) are dropped, never shown late.
+    captionQueue = captionQueue.filter(c => c.priority >= 3 || now - c.at < 1600);
+    if (!caption && captionQueue.length) { caption = captionQueue.shift(); caption.shownAt = now; }
+    const live = caption && night.state === 'playing';
+    const loc = live ? caption.loc : steady[0], sub = live ? caption.text : steady[1], ins = steady[2];
+    const key = `${loc}|${sub}|${ins}`;
+    if (key !== lastLine) { $('location').textContent = loc; $('subtitle').textContent = sub; $('instruction').textContent = ins; lastLine = key; }
+    $('instruction').classList.toggle('urgent', /!/.test(ins));
+    $('objective').textContent = night.state === 'won' ? '문을 잠갔다.' : C.OBJECTIVES[s.beat] || '';
+    $('roomCaption').textContent = s.turn >= .5 ? '침실 안쪽 · 서랍장' : '침실 쪽 · 중문';
+    // Hints near controls.
+    const hint = $('hint');
+    let hintText = '', hx = 0, hy = 0;
+    if (frontUsable && s.beat === 'P0' && !s.boltHeld) { hintText = '누른 채 ↑'; const p = toStage(1164.95, 700); hx = p.x; hy = p.y + 8; }
+    else if (frontUsable && s.beat === 'C1' && !s.held && s.o < .02) { hintText = '누른 채 ← 열기'; const p = toStage(T.door.handleX - 440 * s.o, 500); hx = p.x; hy = p.y; }
+    else if (frontUsable && boltBeat && s.beat !== 'P0' && !s.boltHeld && !s.held && !s.seatedFlag) { hintText = '걸쇠 ↓'; const p = toStage(1164.95 - 440 * s.o, 700); hx = p.x; hy = p.y + 8; }
+    hint.hidden = !hintText; if (hintText) { hint.textContent = hintText; hint.style.left = `${hx}px`; hint.style.top = `${hy}px`; }
+    // Result screen after the loss tail.
+    if (night.state !== lastState) { lastState = night.state; resultAge = 0; if (['won', 'lost'].includes(night.state)) { resetInput(); $('pause').disabled = true; } }
+    if (['won', 'lost'].includes(night.state) && resultAge >= (night.state === 'won' ? .2 : .95) && $('end').hidden) showEnd();
+    if (s.beat !== lastBeat) { lastBeat = s.beat; }
+    const focused = document.activeElement;
+    if (night.state === 'playing' && focused && focused.classList && (focused.classList.contains('hotspot') || focused.id === 'turn') && focused.disabled) {
+      const next = [handle, boltHit, $('turn')].find(el => !el.disabled && !el.hidden);
+      if (next) next.focus({ preventScroll: true });
+    }
+  }
+  function frame(nowMs) {
+    lastRawDt = lastFrame ? (nowMs - lastFrame) / 1000 : 0;
+    const dt = lastFrame ? Math.min(.08, (nowMs - lastFrame) / 1000) : 0; lastFrame = nowMs;
+    night.update(dt); if (['won', 'lost'].includes(night.state)) resultAge += dt;
+    const leanWanted = night.state === 'playing' && night.turn === 0 && !night.held && !night.gazeDown &&
+      (night.beat === 'P0' || (night.beat === 'F3' && !night.seatedFlag) || (night.beat === 'C7' && night.boltHeld));
+    lean = reduced ? (leanWanted ? 1 : 0) : Math.max(0, Math.min(1, lean + (leanWanted ? 1 : -1) * dt / .45));
+    if (night.active()) gazeInput();
+    if (keyTravel && night.held && !night.gripping()) { const chunk = Math.sign(keyTravel) * Math.min(Math.abs(keyTravel), night.cap() * dt); night.drag(chunk, 0); keyTravel -= chunk; if (Math.abs(keyTravel) < 1e-6) keyTravel = 0; }
+    else if (!night.held) keyTravel = 0;
+    const events = night.events.splice(0);
+    handleEvents(events);
+    if (audio) { const sound = night.soundState(); audio.mirror(sound.streams); audio.setBeds(sound.beds); }
     render(); requestAnimationFrame(frame);
   }
-  const sources = ['apartment.png', 'door.png', 'hand.png', 'hand-grip.png'];
-  Promise.all(sources.map(src => new Promise((resolve, reject) => {
-    const img = new Image(); img.onload = resolve; img.onerror = reject; img.src = `./assets/${src}`;
-  }))).then(() => { assetsReady = true; $('start').disabled = false; $('loadStatus').textContent = '마우스 드래그 · 약 1분 · Esc 일시정지'; }).catch(() => {
-    $('loadStatus').textContent = '그림을 불러오지 못했습니다. 페이지를 새로고침해 주세요.';
-  });
-  Object.defineProperty(window, 'doorPrototypeSnapshot', { get: () => model.snapshot() });
+
+  // ---- loading ------------------------------------------------------------------------------------------
+  const IMAGES = ['apartment.png', 'door.png', 'hand.png', 'hand-grip.png', 'front-lit.webp', 'eyes.webp', 'latch-body.webp', 'latch-bolt.webp',
+    'switch-body.webp', 'switch-rocker.webp', 'slipper-wedge.webp', 'rear-room.webp', 'rear-drawer-front.webp'];
+  audioFiles = window.RoomSound.prefetch();
+  Promise.all(IMAGES.map(src => new Promise((resolve, reject) => { const img = new Image(); img.onload = resolve; img.onerror = reject; img.src = `./assets/${src}`; })))
+    .then(() => { assetsReady = true; $('start').disabled = false; $('loadStatus').textContent = '왼쪽·오른쪽 버튼 · 약 4–8분 · Esc 일시정지'; })
+    .catch(() => { $('loadStatus').textContent = '그림을 불러오지 못했습니다. 페이지를 새로고침해 주세요.'; });
+  // Read-only QA surface: a frozen snapshot and the audio graph's actual values. No setters.
+  Object.defineProperty(window, 'doorH4', { value: Object.freeze({ snapshot: () => night.snapshot(), audioProbe: () => audio ? { ...audio.probe(), lastRawDt, sinceFrame: (performance.now() - lastFrame) / 1000 } : null, soundState: () => night.soundState() }) });
   render(); requestAnimationFrame(frame);
 })();
