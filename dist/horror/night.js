@@ -1,4 +1,4 @@
-// Rules of the night: one door, seven tension gimmicks and the H2 hand, as a deterministic,
+// Focus cut: a slow door, one force-resistance hand, and a blind close. Deterministic,
 // DOM-free model. The view feeds intents (grip, drag, gaze, turn, switch, slipper, bolt) and
 // drains events; tests drive the same object. No Math.random, Date or performance here.
 (function (root) {
@@ -6,9 +6,9 @@
   const T = root.DoorTuning || require('./tuning.js');
   const CONTOURS = root.DoorContours || require('./contours.js');
   const clamp = (n, low = 0, high = 1) => Math.max(low, Math.min(high, n));
-  const BEATS = ['P0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6a', 'C6b', 'C6c', 'C7', 'F1', 'F2', 'F3', 'END'];
-  const CHECKPOINT = { P0: 'P0', C1: 'C1', C2: 'C2', C3: 'C3', C4: 'C4', C5: 'C5', C6a: 'C6', C6b: 'C6', C6c: 'C6', C7: 'C7', F1: 'C7', F2: 'C7', F3: 'C7', END: 'C7' };
-  const CHECKPOINT_BEAT = { P0: 'P0', C1: 'C1', C2: 'C2', C3: 'C3', C4: 'C4', C5: 'C5', C6: 'C6a', C7: 'C7' };
+  const BEATS = ['C1', 'C2', 'C3', 'C4', 'F3', 'END'];
+  const CHECKPOINT = { C1:'C1', C2:'C1', C3:'C3', C4:'C4', F3:'F3', END:'F3' };
+  const CHECKPOINT_BEAT = { C1:'C1', C3:'C3', C4:'C4', F3:'F3' };
   const GLASS_FROM = BEATS.indexOf('C3'), RULES_PRY = .25;
 
   // ---- masking sounds ---------------------------------------------------------------------
@@ -39,7 +39,7 @@
     constructor() { this.attempt = 0; this.failCounts = {}; this.reset(); }
     reset() {
       Object.assign(this, {
-        state: 'ready', beat: 'P0', paused: false, time: 0, reason: '', events: [], serial: 0, s: {}, cp: null, hint: 0,
+        state: 'ready', beat: 'C1', paused: false, time: 0, reason: '', events: [], serial: 0, s: {}, cp: null, hint: 0,
         // door
         o: 0, held: false, flush: true, unflushDrag: 0, holder: 'none', holderFloor: 0, reqDoor: 0, playerHistory: [], openHistory: [],
         playerPos: 0, posHistory: [], knockImpact: false, handContext: '', preview: .015, slamLock: -10, boltSpeed: 0, watchSteps: 0,
@@ -62,7 +62,7 @@
         mimic: 'none', mimicTime: 0, oRef: 0, o5: 0, bait: 0, copy: 0, copied: 0, P: 0, pinchWarned: false, loiterRef: 0, loiter: 0, loiterTaps: 0,
         fingersOut: 0, palm: 0,
         // G5 wedge and shoves
-        wedge: 'rest', wedgeTime: 0, slip: 0, slipLevel: 0, slipEvents: 0, prop: true, shoves: false, shoveClock: 0, shovePeriod: T.shove.periodSolo,
+        wedge: 'rest', wedgeTime: 0, slip: 0, slipLevel: 0, slipEvents: 0, prop: false, shoves: false, shoveClock: 0, shovePeriod: T.shove.periodSolo,
         shovePhase: 'idle', shoveTime: 0, absorbed: 0, wedgeTried: false, gripSince: -1,
         // G7 drawer
         drawer: 'idle', d: 0, visit: 0, watchTime: 0, slidePlayed: false,
@@ -74,10 +74,10 @@
     emit(type, detail = {}) { this.events.push({ type, id: ++this.serial, time: this.time, beat: this.beat, ...detail }); }
 
     // ---- lifecycle ------------------------------------------------------------------------
-    start(checkpoint = 'P0', fresh = false) {
+    start(checkpoint = 'C1', fresh = false) {
       if (fresh) this.failCounts = {};
-      const beat = CHECKPOINT_BEAT[checkpoint] || 'P0';
-      const keep = this.cp && checkpoint !== 'P0' && this.cp.id === checkpoint ? this.cp : null;
+      const beat = CHECKPOINT_BEAT[checkpoint] || 'C1';
+      const keep = this.cp && checkpoint !== 'C1' && this.cp.id === checkpoint ? this.cp : null;
       this.attempt++; this.reset(); this.state = 'playing';
       this.hint = (this.failCounts[beat] || 0) >= 2 ? 2 : (this.failCounts[beat] || 0) >= 1 ? 1 : 0;
       this.canonical(beat);
@@ -85,25 +85,20 @@
       this.emit('start', { checkpoint });
       this.enter(beat);
     }
-    retry() { this.start(this.cp ? this.cp.id : 'P0'); }
+    retry() { this.start(this.cp ? this.cp.id : 'C1'); }
     canonical(beat) {
-      // Canonical checkpoint states (spec section 10). P0 begins with the bolt seated.
-      const pre = BEATS.indexOf(beat);
-      this.b = beat === 'P0' ? 1 : 0; this.flush = this.b > 0 || beat === 'C1';
-      this.o = { P0: 0, C1: 0, C2: .45, C3: .62, C4: .62, C5: .55, C6a: .012, C7: .012 }[beat] || 0;
-      if (pre >= BEATS.indexOf('C2')) this.flush = false;
-      if (pre >= BEATS.indexOf('C3')) { this.corridor = 'dead'; this.corridorShade = T.corridor.dead; this.revealed = true; this.confirmRoute = 'retry'; }
-      if (beat === 'C4' || beat === 'C5') { this.holder = 'min045'; this.holderFloor = .45; }
-      if (pre >= BEATS.indexOf('C6a')) { this.holder = 'unseated012'; this.holderFloor = .012; }
-      if (pre >= BEATS.indexOf('C7')) this.prop = false;
-      this.ambience = beat === 'P0' || beat === 'C1' ? 1 : .6; this.ambienceTarget = this.ambience;
+      this.b=0; this.prop=false; this.flush=beat==='C1'||beat==='F3';
+      this.o={C1:0,C2:.46,C3:.5,C4:.5,F3:0}[beat]||0;
+      if (BEATS.indexOf(beat)>=BEATS.indexOf('C3')) { this.corridor='dead'; this.corridorShade=T.corridor.adapted; this.revealed=true; this.confirmRoute='dark'; }
+      if (beat==='C3') { this.holder='hand'; this.holderFloor=.45; }
+      this.ambience=beat==='C1'?1:.25; this.ambienceTarget=this.ambience;
     }
     enter(beat) {
       const from = this.beat;
       this.beat = beat; this.s = { t: 0 };
       const cp = CHECKPOINT[beat];
-      if (beat === CHECKPOINT_BEAT[cp] || (beat === 'P0')) {
-        if (cp !== 'P0') this.A = Math.min(this.A, T.attention.checkpointCap);
+      if (beat === CHECKPOINT_BEAT[cp] || (beat === 'C1')) {
+        if (cp !== 'C1') this.A = Math.min(this.A, T.attention.checkpointCap);
         this.cp = { id: cp, A: this.A, light: this.light };
       }
       if (beat === 'C7') this.A = Math.min(this.A, T.attention.checkpointCap);
@@ -130,7 +125,7 @@
     // ---- intents --------------------------------------------------------------------------
     frontReady() { return !this.wantRear && this.turn === 0; }
     gripping() { return this.hand && (this.handStage === 'approach' || this.handStage === 'grip'); }
-    inputLocked() { return !this.active() || this.beat === 'END' || (this.beat === 'C7' && this.s.pulling); }
+    inputLocked() { return !this.active() || this.beat === 'END'; }
     grip() {
       if (this.inputLocked() || !this.frontReady() || this.boltHeld || this.held) return false;
       this.held = true; this.reqDoor = 0; this.unflushDrag = 0; if (this.gripSince < 0) this.gripSince = this.time;
@@ -148,48 +143,21 @@
       else if (!this.gripping()) this.reqDoor += clamp(dDoor, -.05, .05);
     }
     setGaze(down) {
-      const value = !!down && this.active() && this.frontReady();
+      const value = !!down && this.active() && this.frontReady() && this.beat === 'C4';
       if (value !== this.gazeDown) { this.gazeDown = value; this.emit(value ? 'gaze-down' : 'gaze-up'); }
     }
-    // Looking behind unlocks with the drawer chapter; the switch with the corridor chapter.
-    turnUnlocked() { return BEATS.indexOf(this.beat) >= BEATS.indexOf('C6a') && this.beat !== 'END'; }
-    switchUnlocked() { return BEATS.indexOf(this.beat) >= BEATS.indexOf('C2'); }
-    canTurn() { return !this.inputLocked() && this.turnUnlocked() && !this.held && !this.boltHeld && !this.gazeDown && !['inserting', 'removing'].includes(this.wedge); }
-    setTurn(rear) {
-      rear = !!rear;
-      if (rear === this.wantRear || (rear && !this.canTurn()) || (!rear && !this.active())) return false;
-      this.wantRear = rear; this.emit('turn', { to: rear ? 'rear' : 'door' }); return true;
+    // The cut removes extra tools and camera chores from the playable surface.
+    turnUnlocked(){return false;} switchUnlocked(){return false;}
+    canTurn(){return false;} canSwitch(){return false;} canWedge(){return false;}
+    setTurn(){return false;} toggleLight(){return false;} toggleWedge(){return false;}
+    watching(){return false;}
+    boltMovable(){return this.beat==='F3'&&this.flush&&!this.held&&!this.hand;}
+    grabBolt(){
+      if(this.inputLocked()||!this.boltMovable()||this.seatedFlag)return false;
+      this.b=1; this.seatedFlag=true; this.emit('latch-click'); this.enter('END'); return true;
     }
-    handsFree() { return !this.held && !this.boltHeld; }
-    canSwitch() { return !this.inputLocked() && this.switchUnlocked() && this.frontReady() && this.handsFree() && !this.gazeDown && this.time - this.lastSwitch >= T.light.debounce; }
-    toggleLight() {
-      if (!this.canSwitch()) return false;
-      this.light = !this.light; this.lastSwitch = this.time; this.emit(this.light ? 'light-on' : 'light-off');
-      this.noise(T.attention.click, 'switch', true); return true;
-    }
-    wedgeBeat() { return ['C6b', 'C6c'].includes(this.beat) && this.prop; }
-    canWedge() {
-      if (this.inputLocked() || !this.wedgeBeat() || !this.frontReady() || !this.handsFree() || this.gripping()) return false;
-      if (this.wedge === 'in') return true;
-      return this.wedge === 'rest' && this.o >= T.wedge.min && this.o <= T.wedge.max && this.shovePhase === 'idle';
-    }
-    toggleWedge() {
-      if (!this.canWedge()) { if (this.wedgeBeat()) this.emit('wedge-refused', { reason: this.shovePhase !== 'idle' ? 'shove' : this.held ? 'hand' : 'range' }); return false; }
-      this.wedgeTried = true;
-      if (this.wedge === 'in') { this.wedge = 'removing'; this.wedgeTime = 0; this.emit('wedge-removing'); }
-      else { this.wedge = 'inserting'; this.wedgeTime = 0; this.emit('wedge-inserting'); }
-      return true;
-    }
-    boltMovable() { return !this.held && !this.gripping() && (this.mimic === 'none' || this.mimic === 'out') && this.wedge === 'rest' && this.o <= T.bolt.openMax; }
-    grabBolt() {
-      if (this.inputLocked() || !this.frontReady() || this.held || !['P0', 'C7', 'F3'].includes(this.beat)) return false;
-      if (this.beat === 'F3' && this.seatedFlag) return false;
-      this.boltHeld = true; this.reqBolt = 0; this.emit('bolt-grab');
-      if (this.beat === 'C7' && this.s.pullAt === undefined) this.s.pullAt = this.s.t;
-      return true;
-    }
-    dragBolt(db) { if (this.active() && this.boltHeld) this.reqBolt += clamp(db, -.15, .15); }
-    releaseBolt() { if (this.boltHeld) this.emit('bolt-release'); this.boltHeld = false; this.reqBolt = 0; }
+    dragBolt(){}
+    releaseBolt(){this.boltHeld=false;this.reqBolt=0;}
 
     // ---- attention ------------------------------------------------------------------------
     noise(amount, source, maskable) {
@@ -205,7 +173,7 @@
     updateAttention(h) {
       this.leak = this.light && this.o >= T.attention.leakFrom && this.beat !== 'END';
       if (this.leak) { this.noise(T.attention.leak * h, 'light', false); if (!this.active()) return; }
-      else if (this.time - this.lastGain >= T.attention.decayAfter) this.A = Math.max(0, this.A - T.attention.decay * h);
+      else if (this.time - this.lastGain >= T.focus.recoveryAfter) this.A = Math.max(0, this.A - T.focus.recovery * h);
       T.attention.warn.forEach((level, i) => { if (this.warned[i] && this.A < level - .1) this.warned[i] = false; });
     }
 
@@ -252,17 +220,9 @@
     // ---- door -----------------------------------------------------------------------------
     band(o = this.o) { const [a, b] = T.door.stiff; return o < a ? 'A' : o <= b ? 'stiff' : 'B'; }
     floor() { return this.holder === 'none' ? 0 : this.holder === 'fingers' ? .012 : this.holderFloor; }
-    // In C5 the player may not open into the mimic's fail line; elsewhere the player max applies.
-    mimicLine() { return Math.min(T.mimic.failCap, this.o5 + T.mimic.failSpan, T.door.playerMax - T.mimic.bait); }
-    openCap() { return this.holder === 'fingers' && this.mimic !== 'out' ? Math.min(T.door.playerMax, this.mimicLine() - .03) : T.door.playerMax; }
-    // Highest reference from which a bait (0.02 of the player's own opening) is still possible.
-    baitCeil() { return this.openCap() - T.mimic.bait - .005; }
-    cap() {
-      const stiff = this.band() === 'stiff';
-      if (this.holder === 'fingers' && this.mimic !== 'out') return stiff ? T.door.fingerStiff : T.door.fingerQuiet;
-      return stiff ? T.door.capStiff : T.door.capQuiet;
-    }
-    doorMovable() { return this.held && !this.gripping() && !['inserting', 'in', 'removing'].includes(this.wedge) && this.b <= T.bolt.free; }
+    openCap(){return T.door.playerMax;}
+    cap(){return this.band()==='stiff'?T.door.capStiff:this.beat==='C1'||this.beat==='C2'?T.focus.openSpeed:T.door.capQuiet;}
+    doorMovable(){return this.held&&!this.gripping()&&this.b<=T.bolt.free&&this.beat!=='F3'&&this.beat!=='END';}
     stepDoor(h, share) {
       let moved = 0;
       if (this.doorMovable() && share !== 0) {
@@ -272,8 +232,6 @@
           if (this.unflushDrag <= T.door.unflushDrag) d = 0; else { this.flush = false; this.emit('unflush'); }
         }
         if (d < 0 && this.time < this.slamLock) d = 0;
-        if (d < 0 && this.mimic === 'arrive') d = 0;
-        if (d < 0 && this.mimic === 'grab') d = 0;
         let next = this.o + d;
         if (d > 0) next = Math.min(next, Math.max(this.o, this.openCap()));
         if (d < 0) next = Math.max(next, Math.min(this.o, this.floor()));
@@ -290,7 +248,8 @@
               const free = Math.min(cost, this.preview); this.preview -= free; cost -= free;
               if (!this.s.previewed) { this.s.previewed = true; this.emit('stiff-first'); }
             }
-            this.noise(T.attention.scrape * cost, 'scrape', true);
+            const speed=Math.abs(moved)/h, rush=clamp((speed-T.focus.quietSpeed)/(T.door.capStiff-T.focus.quietSpeed));
+            this.noise(T.focus.rushCost * cost * rush, 'scrape', true);
           }
           this.checkStops(before);
         }
@@ -384,341 +343,48 @@
       if (this.E >= T.eyes.warn && !this.eyesWarned) { this.eyesWarned = true; this.emit('eyes-warning'); }
       if (this.E < T.eyes.warn * .5) this.eyesWarned = false;
       if (this.E >= 1) { this.fail('eyes'); return; }
-      if (this.eyesVisit === 'C4') {
-        if (this.gazeDown && this.held) this.chord += h;
-        const full = since - V.fade;
-        if (full >= V.stay && this.chord < V.chordGrip && !this.s.chordHint) { this.s.chordHint = true; this.emit('eyes-chord-hint'); }
-        if ((full >= V.stay && this.chord >= V.chordGrip) || full >= V.stay + V.overstay) { this.eyes = 'withdraw'; this.emit('eyes-withdraw'); }
-      } else if (this.o < T.eyes.irisFrom && this.eyesFade > 0) { this.eyes = 'withdraw'; this.emit('eyes-withdraw'); }
-    }
-
-    // ---- G6 mimic ----------------------------------------------------------------------------
-    mimicTo(state) { this.mimic = state; this.mimicTime = 0; if (state === 'watch') this.watchSteps = 0; if (state === 'grab') this.yanked = 0; this.emit('mimic-' + state); }
-    updateMimic(h, moved) {
-      const M = T.mimic;
-      if (this.mimic === 'none' || this.mimic === 'out') {
-        if (this.mimic === 'out') { this.fingersOut = Math.min(1, this.fingersOut + h / M.fingersOut); }
-        return;
-      }
-      if (this.resumeGrace > 0) return;
-      this.mimicTime += h;
-      const pinchOn = this.mimic === 'watch' || this.mimic === 'delay' || (this.mimic === 'recover' && this.mimicTime >= M.recoverFree);
-      if (this.mimic === 'recover' && this.mimicTime >= M.recoverFree && !this.s.refSet) { this.s.refSet = true; this.oRef = Math.min(this.o, this.baitCeil()); this.P = 0; }
-      if (pinchOn) {
-        this.P = Math.max(0, this.oRef - this.o);
-        if (this.P >= M.pinchWarn && !this.pinchWarned) { this.pinchWarned = true; this.emit('pinch-warning'); }
-        if (this.P >= M.pinchGrab) { this.grabNow('pinch'); return; }
-      } else this.P = 0;
-      if (this.mimic === 'arrive' && this.mimicTime >= M.arrive) { this.oRef = Math.min(this.o, this.baitCeil()); this.loiterRef = this.o; this.loiter = 0; this.mimicTo('watch'); }
-      else if (this.mimic === 'watch') {
-        // Bait: the player's own net leftward travel >= bait within the last second, then stillness.
-        // Player-only positions keep the fingers' copied pull from counting as a bait.
-        this.watchSteps++;
-        const n = Math.min(Math.round(M.baitWindow / T.step), this.watchSteps), hist = this.posHistory, lowest = Math.min(...hist.slice(-n));
-        const size = this.playerPos - lowest;
-        if (size >= M.bait - 1e-9 && this.still()) {
-          this.bait = size; this.copy = Math.min(size, M.copyMax); this.copied = 0;
-          if (size > M.baitLarge) this.emit('bait-large');
-          this.mimicTo('delay');
-        }
-        if (this.o <= this.loiterRef - M.loiterClose) { this.loiterRef = this.o; this.loiter = 0; this.loiterTaps = 0; }
-        this.loiter += h;
-        if (this.loiterTaps < M.loiterTap.length && this.loiter >= M.loiterTap[this.loiterTaps]) { this.loiterTaps++; this.emit('loiter-tap', { count: this.loiterTaps }); }
-        if (this.loiter >= M.loiterGrab) { this.grabNow('loiter'); return; }
-      } else if (this.mimic === 'delay') {
-        if (this.light && this.mimicTime >= M.palmAt && !this.s.palmShown) { this.s.palmShown = true; this.emit('palm'); }
-        if (this.mimicTime >= M.delay) { this.mimicTo('response'); this.spawn('mimic'); }
-      } else if (this.mimic === 'response') {
-        // The fingers pull the door open by the bait's size (capped) while the player closes against them.
-        const step = Math.min(this.copy - this.copied, this.copy * h / M.response);
-        this.copied += step; this.o = Math.min(Math.max(this.o, this.baitCeil()), this.o + step);
-        if (this.mimicTime >= M.response) {
-          if (this.o < M.out) { this.mimicTo('out'); this.fingersOut = 0; this.holder = 'unseated012'; this.holderFloor = .012; this.emit('fingers-out'); }
-          else { this.s.refSet = false; this.mimicTo('recover'); }
-        }
-      } else if (this.mimic === 'recover') {
-        if (this.mimicTime >= M.recover) { this.pinchWarned = false; this.loiterRef = Math.min(this.loiterRef, this.o); this.mimicTo('watch'); }
-      } else if (this.mimic === 'grab') {
-        if (this.yanked < this.yankBy) { const step = Math.min(this.yankBy - this.yanked, this.yankBy * h / M.yankTime); this.yanked += step; this.o = clamp(this.o + step); }
-        if (this.mimicTime >= M.grab) { this.ducking = false; this.oRef = Math.min(this.o, this.baitCeil()); this.P = 0; this.pinchWarned = false; this.loiter = 0; this.loiterTaps = 0; this.loiterRef = this.o; this.mimicTo('watch'); }
-      }
-      if (this.o >= this.mimicLine() - 1e-9) this.fail('mimic');
-    }
-    grabNow(why) {
-      // A yank either leaves the door baitable or wrenches it to the fail line: never an unwinnable WATCH.
-      this.yankBy = this.o + T.mimic.yank > this.baitCeil() + 1e-9 ? Math.max(T.mimic.yank, this.mimicLine() - this.o + 1e-6) : T.mimic.yank;
-      this.ducking = true; this.P = 0; this.impact = 1; this.contact = 1; this.mimicTo('grab'); this.emit('mimic-yank', { why });
-    }
-
-    // ---- G5 shoves and wedge -------------------------------------------------------------------
-    attended() { return this.held && this.frontReady(); }
-    updateWedge(h) {
-      const W = T.wedge;
-      if (this.wedge === 'inserting' || this.wedge === 'removing') {
-        this.wedgeTime += h;
-        if (this.wedge === 'inserting' && this.wedgeTime >= W.insert) { this.wedge = 'in'; this.slip = 0; this.slipLevel = 0; this.emit('wedge-in'); this.noise(T.attention.wedge, 'wedge', true); }
-        if (this.wedge === 'removing' && this.wedgeTime >= W.remove) { this.wedge = 'rest'; this.slip = 0; this.slipLevel = 0; this.emit('wedge-out'); this.noise(T.attention.wedge, 'wedge', true); }
-      }
-      if (this.wedge === 'in' && this.attended()) this.slip = Math.max(0, this.slip - T.shove.reseat * h);
-      this.slipLevel = this.wedge === 'in' ? Math.min(2, Math.floor(this.slip / T.shove.slip + 1e-6)) : 0;
-    }
-    updateShoves(h) {
-      if (!this.shoves || this.resumeGrace > 0) return;
-      const S = T.shove;
-      this.shoveClock += h;
-      if (this.shovePhase === 'idle' && this.shoveClock >= this.s.nextShove) { this.shovePhase = 'inhale'; this.shoveTime = 0; this.emit('shove-inhale'); }
-      else if (this.shovePhase === 'inhale') {
-        this.shoveTime += h;
-        if (this.shoveTime >= S.inhale) { this.shovePhase = 'shove'; this.shoveTime = 0; this.resolveShove(); }
-      } else if (this.shovePhase === 'shove') {
-        this.shoveTime += h;
-        if (this.s.shovePush) { const step = Math.min(this.s.shovePush, S.push * h / S.shove); this.s.shovePush -= step; this.o = clamp(this.o + step); }
-        if (this.shoveTime >= S.shove) { this.shovePhase = 'idle'; this.s.nextShove = this.shoveClock + this.shovePeriod - S.inhale - S.shove; }
-      }
-      if (this.o >= S.forced) this.fail('forced');
-    }
-    resolveShove() {
-      const S = T.shove;
-      this.impact = Math.max(this.impact, .5);
-      if (this.attended()) {
-        this.absorbed++; this.contact = 1; this.emit('shove', { result: 'held' });
-        if (!this.wedgeTried && this.beat === 'C6b') {
-          if (this.absorbed === S.hintAfter) this.emit('wedge-hint');
-          if (this.absorbed >= S.skipAfter) this.s.skip = true;
-        }
-      } else if (this.wedge === 'in') {
-        this.slip += S.slip; this.slipEvents++;
-        if (this.slip >= S.slipPop - 1e-6) {
-          this.wedge = 'rest'; this.slip = 0; this.slipLevel = 0; this.s.shovePush = T.wedge.popPush; this.emit('wedge-pop');
-        } else this.emit('wedge-slip', { level: Math.floor(this.slip / S.slip + 1e-6) });
-        this.s.lastSlipAt = this.time; this.emit('shove', { result: 'wedge' });
-      } else { this.s.shovePush = S.push; this.emit('shove', { result: 'open' }); }
-    }
-
-    // ---- G7 drawer ---------------------------------------------------------------------------
-    drawerNow(visit) { this.drawer = 'open'; this.visit = visit; this.d = 0; this.watchTime = 0; this.slidePlayed = false; this.emit('drawer-start', { visit }); }
-    watching() { return this.wantRear && this.turn >= T.turn.watchFrom; }
-    updateDrawer(h) {
-      if (this.drawer !== 'open' || this.resumeGrace > 0) return;
-      const D = T.drawer;
-      if (this.watching()) {
-        if (this.watchTime === 0) this.emit('drawer-stop');
-        this.watchTime += h;
-        if (this.watchTime >= D.watchDelay) {
-          this.d = Math.max(0, this.d - (this.visit === 1 ? D.close1 : D.close2) * h);
-          if (this.d === 0) { this.drawer = 'shut'; this.emit('drawer-shut', { visit: this.visit }); }
-        }
-      } else {
-        if (this.watchTime > 0) this.emit('drawer-resume');
-        this.watchTime = 0;
-        this.d += (this.visit === 1 ? D.visit1 : D.visit2) * h;
-        if (this.d >= D.slideAt && !this.slidePlayed) { this.slidePlayed = true; this.emit('drawer-slide'); }
-        if (this.d >= 1) this.fail('drawer');
-      }
-    }
-
-    // ---- G2 bolt -----------------------------------------------------------------------------
-    seatLimit() { return this.light ? T.bolt.seatLit : T.bolt.seatDark; }
-    stepBolt(h, share) {
-      const B = T.bolt, near = x => Math.abs(x - B.detent) < 1e-6;
-      this.boltCooldown = Math.max(0, this.boltCooldown - h);
-      let moved = 0;
-      const pushing = this.boltHeld && share !== 0;
-      if (pushing && this.boltMovable() && this.boltCooldown === 0) {
-        let next = clamp(this.b + share);
-        // The detent at 0.8 catches the bolt from either side.
-        if (share > 0 && this.b < B.detent - 1e-9 && next > B.detent) next = B.detent;
-        if (share < 0 && this.b > B.detent + 1e-9 && next < B.detent) next = B.detent;
-        if (near(this.b)) {
-          // The bolt only drops into the floor hole when the door is flush, and never during the C7 trap.
-          const lined = this.flush && this.o <= T.door.flush && this.beat !== 'C7';
-          if (share > 0 && !lined) { next = B.detent; if (!this.s.railStop) { this.s.railStop = true; this.emit('rail-stop'); } }
-          else if (this.detent !== 'armed') next = B.detent;
-        }
-        moved = next - this.b; this.b = next;
-        if (moved && near(this.b)) { this.detent = 'at'; this.detentPause = 0; this.emit('detent'); }
-      }
-      // Passing the detent needs a short pause with no push (spec: 0.2 s, either direction).
-      if (near(this.b)) {
-        if (pushing && this.detent !== 'armed') this.detentPause = 0; else this.detentPause += h;
-        if (this.detentPause >= B.detentPause && this.detent !== 'armed') this.detent = 'armed';
-      } else this.detent = 'none';
-      this.boltHistory.push(moved); if (this.boltHistory.length > Math.round(B.window / T.step)) this.boltHistory.shift();
-      this.boltSpeed = Math.abs(this.boltHistory.reduce((a, x) => a + x, 0)) / B.window;
-      if (moved && this.boltCooldown === 0) {
-        const seat = this.b > B.detent + 1e-6 || (near(this.b) && this.b - moved > B.detent + 1e-6);
-        const limit = seat ? this.seatLimit() : B.guideMax;
-        if (this.boltSpeed > limit + 1e-9) this.rattle(moved > 0 ? 'down' : 'up', seat);
-      }
-      if (this.b >= 1 - 1e-9 && !this.seatedFlag && moved > 0) {
-        this.seatedFlag = true; this.emit('latch-click', { beat: this.beat });
-        if (this.beat === 'F3') { this.releaseBolt(); this.enter('END'); }
-      }
-      if (this.b < 1 - 1e-6) this.seatedFlag = false;
-      if (this.beat === 'P0' && this.b <= 1e-6 && !this.s.freed) { this.s.freed = true; this.releaseBolt(); this.emit('bolt-free'); this.enter('C1'); }
-    }
-    rattle(dir, seat, free = false) {
-      const B = T.bolt;
-      this.boltCooldown = B.cooldown; this.boltHistory = []; this.impact = Math.max(this.impact, .6);
-      if (dir === 'down') this.b = seat ? B.kickSeat : Math.max(0, this.b - B.kickGuide);
-      else if (seat) this.b = this.beat === 'P0' ? 1 : B.detent;
-      this.detent = 'none';
-      this.emit('latch-rattle', { dir, seat, free });
-      if (!free) this.noise(T.attention.rattle, 'rattle', false);
+      if (this.o < T.eyes.irisFrom && this.eyesFade > 0) { this.eyes='withdraw'; this.emit('eyes-withdraw'); }
     }
 
     // ---- director ----------------------------------------------------------------------------
     hush() { if (this.ambienceTarget !== 0) { this.ambienceTarget = 0; this.emit('hush'); } }
     unhush() { if (this.ambienceTarget === 0) { this.ambienceTarget = T.beats.ambienceAfter; this.emit('unhush'); } }
     direct(h) {
-      const s = this.s, B = T.beats;
-      s.t += h;
-      switch (this.beat) {
-        case 'P0':
-          if (s.t >= B.p0Click && !s.clicked) { s.clicked = true; this.emit('front-door'); }
-          break;
+      const s=this.s; s.t+=h;
+      switch(this.beat){
         case 'C1':
-          // Start the outside sounds as the edge nears the stiff band (or after a while), so a
-          // cautious player who stops short of the band is never left without cover.
-          if (!this.program && (this.o >= T.door.stiff[0] - .04 || s.t >= 10)) this.startProgram(B.c1MaskDelay);
-          if (!s.entered && this.o >= T.door.stiff[0]) { s.entered = true; this.emit('stiff-enter'); }
-          if (this.o >= .42) this.enter('C2');
+          if(!this.program&&(this.o>=.08||s.t>=3))this.startProgram(0);
+          if(!s.entered&&this.o>=T.door.stiff[0]){s.entered=true;this.emit('stiff-enter');}
+          if(this.o>=.46)this.enter('C2');
           break;
         case 'C2':
-          if (!this.program) this.startProgram(B.c1MaskDelay);
-          if (this.corridor === 'on' && this.o >= T.corridor.adaptFrom) { this.corridor = 'flicker'; this.flickerAt = this.time; this.emit('tube-flicker'); }
-          if (this.corridor === 'flicker') {
-            const k = (this.time - this.flickerAt) / T.corridor.flicker;
-            this.corridorShade = k >= 1 ? T.corridor.dead : (Math.floor(k * 6) % 2 ? .6 : .1);
-            if (k >= 1) { this.corridor = 'dead'; this.emit('tube-dead'); }
-          } else if (this.corridor === 'dead' && !this.confirmRoute) {
-            if (this.o >= T.corridor.adaptFrom && this.still()) this.adapt += h;
-            this.corridorShade = T.corridor.dead - (T.corridor.dead - T.corridor.adapted) * clamp(this.adapt / T.corridor.adaptTime);
-            if (this.light && this.o >= T.corridor.adaptFrom) { s.litFor = (s.litFor || 0) + h; if (s.litFor >= T.light.confirmDelay) this.confirm('lit'); }
-            else { if (this.light && !s.shutHint) { s.shutHint = true; this.emit('lit-too-shut'); } s.litFor = 0; }
-            if (this.adapt >= T.corridor.adaptTime && !this.confirmRoute) this.confirm('dark');
-          }
-          if (this.confirmRoute) {
-            s.after = (s.after || 0) + h;
-            if (this.confirmRoute === 'lit') this.silhouette = s.after < T.light.silhouette ? 1 : Math.max(0, 1 - (s.after - T.light.silhouette) / T.light.silhouetteSlide);
-            if (s.after >= B.c3After) this.enter('C3');
-          }
+          if(!s.started){s.started=true;this.stopProgram();this.corridor='flicker';this.emit('tube-flicker');}
+          this.corridorShade=s.t<1.1?(Math.floor(s.t*5)%2?.55:.12):T.corridor.adapted;
+          if(s.t>=1.1&&!s.dead){s.dead=true;this.corridor='dead';this.revealed=true;this.confirmRoute='dark';this.emit('tube-dead');this.hush();}
+          if(s.t>=T.focus.revealAfter)this.enter('C3');
           break;
         case 'C3':
-          if (!s.hushAt && this.L < .2) { s.hushAt = s.t; this.hush(); }
-          if (s.hushAt && !s.knocked) {
-            const k = s.t - s.hushAt - B.c3Hush;
-            B.glassKnocks.forEach((at, i) => { if (k >= at && (s.kn || 0) === i) { s.kn = i + 1; this.impact = 1; this.emit('glass-knock', { index: i }); } });
-            if ((s.kn || 0) >= 3 && k >= B.glassKnocks[2] + .6) {
-              s.knocked = true; this.emit('not-downstairs');
-              // From here something holds the door from outside: it cannot be closed below 0.45.
-              this.holder = 'min045'; this.holderFloor = .45;
-              this.handNow('C3'); this.pryTo = .45;
-            }
+          if(!s.hush){s.hush=true;this.hush();this.holder='hand';this.holderFloor=.45;}
+          T.beats.glassKnocks.forEach((at,i)=>{if(s.t>=at+.25&&(s.kn||0)===i){s.kn=i+1;this.impact=.7;this.emit('glass-knock',{index:i});}});
+          if(s.t>=1.8&&!s.hand){s.hand=true;this.emit('not-downstairs');this.handNow('C3');this.pryTo=.45;}
+          if(s.hand&&!this.hand&&this.handStage==='released'){
+            this.holder='none';this.holderFloor=0;this.sources=[];this.program=null;this.covered=false;this.L=0;this.enter('C4');
           }
-          if (s.knocked && !this.hand && this.handStage === 'released') { this.unhush(); this.enter('C4'); }
           break;
         case 'C4':
-          if (!s.hushed && s.t >= .5) { s.hushed = true; this.hush(); }
-          if (s.t >= B.c4After && !s.eyes) { s.eyes = true; this.eyesNow('C4'); }
-          if (s.eyes && this.eyes === 'none') this.enter('C5');
-          break;
-        case 'C5': {
-          const [back, hold, quiet] = T.mimic.intro;
-          if (!s.back) { s.back = true; this.unhush(); }
-          if (s.t >= back + hold && !s.hushed) { s.hushed = true; this.hush(); }
-          if (s.t >= back + hold + quiet && this.mimic === 'none' && !s.arrived) {
-            s.arrived = true; this.holder = 'fingers'; this.holderFloor = 0; this.o5 = this.o; this.oRef = Math.min(this.o, this.baitCeil()); this.mimicTo('arrive'); this.emit('fingers');
-            this.startProgram(12);
-          }
-          if (this.mimic === 'out' && this.program && !this.program.stopped) this.stopProgram();
-          if (this.mimic === 'out' && this.fingersOut >= 1) { s.outFor = (s.outFor || 0) + h; if (s.outFor >= B.c6aAfter) { this.mimic = 'none'; this.enter('C6a'); } }
-          break;
-        }
-        case 'C6a':
-          if (!s.silent) { s.silent = true; this.program = null; this.sources = []; this.L = 0; this.covered = false; }
-          if (s.t >= .01 && !s.hushed) { s.hushed = true; this.hush(); }
-          if (s.t >= B.c6aHush && !s.creak) { s.creak = true; this.emit('rear-creak'); }
-          if (s.t >= B.c6aHush + B.c6aCreak && this.drawer === 'idle') this.drawerNow(1);
-          if (this.drawer === 'shut' && !this.wantRear && this.turn === 0) { this.drawer = 'idle'; this.enter('C6b'); }
-          break;
-        case 'C6b':
-          if (s.t >= B.c6bAfter && !this.shoves) { this.hush(); this.shoves = true; this.shoveClock = 0; this.shovePeriod = T.shove.periodSolo; this.shovePhase = 'idle'; s.nextShove = T.shove.first - T.shove.inhale; this.absorbed = 0; this.slipEvents = 0; this.emit('shoves-start'); }
-          if (this.shoves) {
-            // Done: one shove taken by the wedge alone, then a firm grip for 1 s (or two slips, or the stall breaker).
-            if (s.lastSlipAt !== undefined && this.attended() && this.time - Math.max(s.lastSlipAt, this.gripSince) >= B.c6bGrip) s.done = true;
-            if (this.slipEvents >= 2 || s.skip) s.done = true;
-            if (s.done) { const keep = { nextShove: s.nextShove, shovePush: s.shovePush }; this.enter('C6c'); Object.assign(this.s, keep); this.shovePeriod = T.shove.periodPair; }
-          }
-          break;
-        case 'C6c':
-          if (s.t >= B.c6cAfter && this.drawer === 'idle' && !s.visited) { s.visited = true; this.drawerNow(2); }
-          if (this.drawer === 'shut' && this.shoves && this.shovePhase === 'idle') { this.shoves = false; this.unhush(); this.emit('shoves-stop'); }
-          if (!this.shoves && this.drawer === 'shut') {
-            if (this.wedge === 'rest' && this.attended()) { s.regrip = (s.regrip || 0) + h; if (s.regrip >= B.c6cRegrip) { this.prop = false; this.drawer = 'idle'; this.emit('slipper-worn'); this.enter('C7'); } }
-            else s.regrip = 0;
-          }
-          break;
-        case 'C7':
-          if (!s.prompted) { s.prompted = true; this.emit('close-and-lock'); }
-          if (s.pullAt === undefined && s.t >= B.c7Wait) s.pullAt = s.t;
-          if (s.pullAt !== undefined) {
-            const k = s.t - s.pullAt;
-            if (k >= 0 && !s.hushed) { s.hushed = true; this.hush(); }
-            B.pullKnocks.forEach((at, i) => { if (k >= B.c7Hush + at && (s.kn || 0) === i) { s.kn = i + 1; this.impact = .8; this.emit('glass-knock', { index: i, slow: true }); } });
-            const inhaleAt = B.c7Hush + B.pullKnocks[2] + .4, pullAt = inhaleAt + B.pullInhale;
-            if (k >= inhaleAt && !s.inhale) { s.inhale = true; this.emit('pull-inhale'); }
-            if (k >= pullAt && !s.pulling) {
-              s.pulling = true; s.from = this.o; this.letGo(); this.releaseBolt();
-              if (this.b > 0) { this.b = 0; this.rattle('up', false, true); this.b = 0; }
-              this.flush = false; this.impact = 1; this.contact = 1; this.emit('pull');
-            }
-            if (s.pulling) {
-              const f = clamp((k - pullAt) / B.pullTime);
-              this.o = s.from + (B.pullTo - s.from) * f;
-              if (f >= 1) { this.holder = 'unseated012'; this.holderFloor = .012; this.enter('F1'); }
-            }
-          }
-          break;
-        case 'F1':
-          if (!s.begun) { s.begun = true; this.hush(); this.sources = this.sources.filter(x => x.src === 'mimic'); this.startProgram(B.f1Elevator); }
-          if (s.t >= T.eyes.f1.breathAt && !s.eyes) { s.eyes = true; this.eyesNow('F1'); }
-          if (s.eyes && this.eyes === 'none') { s.gone = (s.gone || 0) + h; if (s.gone >= B.f2After) this.enter('F2'); }
-          break;
-        case 'F2':
-          if (!s.hand) { s.hand = true; this.ducking = true; if (this.program) this.program.paused = true; this.handNow('F2'); }
-          if (s.hand && !this.hand && this.handStage === 'released' && !s.retreated) {
-            s.retreated = true; s.retreatAt = s.t; this.holder = 'none'; this.holderFloor = 0; this.ducking = false; this.unhush();
-            if (this.program) { this.program.paused = false; this.program.nextElevator = Math.max(this.program.nextElevator, this.program.clock + 9); this.program.nextTraffic = Math.max(this.program.nextTraffic, this.program.clock + 20); }
-          }
-          if (s.retreated && !s.traffic && s.t - s.retreatAt >= B.f2Traffic) { s.traffic = true; this.spawn('traffic'); }
-          if (s.retreated && this.flush && !this.held && this.b <= T.bolt.free) { this.emit('seat'); this.enter('F3'); }
+          if(!s.eyes){s.eyes=true;this.hush();this.eyesNow('F1');this.startProgram(.2);}
+          if(this.flush&&!this.held){this.eyes='none';this.eyesFade=0;this.E=0;this.gazeDown=false;this.stopProgram();this.emit('seat');this.enter('F3');}
           break;
         case 'F3':
-          if (!s.begun) { s.begun = true; this.emit('checklist'); this.startProgram(B.f3Elevator); this.hush(); }
-          if (s.t >= B.f3Knocks) {
-            const k = (s.t - B.f3Knocks) % B.f3Period, n = Math.floor((s.t - B.f3Knocks) / B.f3Period);
-            if (n >= (s.kn || 0)) { s.kn = n + 1; this.emit('soft-knock', { index: n }); }
-            this.knockImpact = k < B.f3Impact;
-            if (this.knockImpact && this.b > T.bolt.detent + 1e-6 && !this.seatedFlag) { this.b = T.bolt.kickSeat; this.boltHistory = []; this.detent = 'none'; this.emit('bolt-kicked', { by: 'knock' }); }
-          }
-          if (this.b >= T.bolt.detent - 1e-6 && !this.boltFirst08) {
-            this.boltFirst08 = true;
-            if (this.light) { this.b = T.bolt.kickSeat; this.boltHistory = []; this.detent = 'none'; this.impact = 1; this.emit('palm-slap'); }
-            else this.emit('breath', { visit: 'F3' });
-          }
+          if(!s.prompted){s.prompted=true;this.emit('checklist');}
           break;
         case 'END':
-          if (!s.begun) { s.begun = true; this.hush(); this.letGo(); this.releaseBolt(); this.gazeDown = false; this.wantRear = false; this.stopProgram(); }
-          if (s.t >= B.endRoom && !s.sting) { s.sting = true; this.emit('sting'); }
-          if (s.t >= B.endRoom + B.endSting) this.fade = clamp((s.t - B.endRoom - B.endSting) / B.endFade);
-          if (this.fade >= 1) { this.state = 'won'; this.emit('win'); }
+          if(!s.begun){s.begun=true;this.hush();this.letGo();this.releaseBolt();this.gazeDown=false;this.stopProgram();}
+          if(s.t>=.8&&!s.sting){s.sting=true;this.emit('end-breath');}
+          if(s.t>=1.9)this.fade=clamp((s.t-1.9)/.6);
+          if(this.fade>=1){this.state='won';this.emit('win');}
           break;
       }
-    }
-    confirm(route) {
-      this.confirmRoute = route; this.revealed = true; this.stopProgram(); this.s.after = 0;
-      this.emit('confirm', { route });
     }
 
     // ---- tick ------------------------------------------------------------------------------------
@@ -748,13 +414,9 @@
       this.openHistory.push(this.o); if (this.openHistory.length > Math.round(1.2 / T.step)) this.openHistory.shift();
       this.posHistory.push(this.playerPos); if (this.posHistory.length > Math.round(1.2 / T.step)) this.posHistory.shift();
       if (!this.active()) return;
-      this.stepBolt(h, boltShare); if (!this.active()) return;
       this.updateAttention(h); if (!this.active()) return;
       if (this.hand) { this.updateHand(h); if (!this.active()) return; }
       this.updateEyes(h); if (!this.active()) return;
-      this.updateMimic(h, moved); if (!this.active()) return;
-      this.updateWedge(h); this.updateShoves(h); if (!this.active()) return;
-      this.updateDrawer(h); if (!this.active()) return;
       this.direct(h);
       this.scrape = this.speed;
     }
@@ -785,7 +447,7 @@
         'wedge', 'slip', 'slipLevel', 'slipEvents', 'prop', 'shoves', 'shovePhase', 'drawer', 'd', 'visit', 'watchTime',
         'b', 'boltHeld', 'detent', 'boltSpeed', 'seatedFlag', 'knockImpact', 'fade'];
       const out = Object.fromEntries(keys.map(k => [k, this[k]]));
-      out.duck = this.duck; out.failWhy = this.failWhy; out.openCap = this.openCap(); out.mimicLine = this.mimic !== 'none' ? this.mimicLine() : null;
+      out.duck = this.duck; out.failWhy = this.failWhy; out.openCap = this.openCap(); out.mimicLine = null;
       out.cp = this.cp ? this.cp.id : null; out.band = this.band(); out.lastSource = this.lastSource; out.beatTime = this.s.t || 0;
       out.canTurn = this.canTurn(); out.canSwitch = this.canSwitch(); out.canWedge = this.canWedge(); out.boltMovable = this.boltMovable();
       out.sources = this.sources.map(s => ({ src: s.src, t: s.t, e: envelope(s) * this.duck }));

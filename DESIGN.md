@@ -1,6 +1,6 @@
 ---
 name: "문 좀 살살 — 문틈"
-description: "한 문을 조작하는 2D 1인칭 공포 프로토타입(H4: 일곱 기믹)의 현재 구현"
+description: "문 열기, 한 번의 힘겨루기, 눈을 피하며 닫기로 압축한 1인칭 공포 게임"
 colors:
   ink: "#ded8c7"
   muted: "#a5afa7"
@@ -46,6 +46,14 @@ components:
 ---
 
 # Design System: 문 좀 살살 — 문틈
+
+## Current focus cut — 2026-10-28
+
+The user requested discarding unfun gimmicks. The active flow is slow opening → a brief blackout → one H2 hand fight → blind closing → a one-click lock. Only the sound strip, force panel, gaze control and final lock can appear as active guidance. Slow movement never requires waiting for an outside sound; sound cover permits faster travel. Wedge/drawer, switch choice, mimic, detent/rhythm and the repeated finale are removed. Existing room art, camera hit-testing, sound captions, pause and retry remain.
+
+All H4 descriptions below are historical design documentation, not a requirement to restore removed mechanics. Current rules are in `night.js`; focused values are in `tuning.js` under `focus`.
+
+## Historical H4 design
 
 ## Overview
 

@@ -1,14 +1,13 @@
 {
   "name": "quiet-door",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
-  "description": "A first-person one-door horror prototype (seven tension gimmicks) plus the earlier SVG door game",
+  "description": "A focused one-door horror game: open quietly, resist one hand, close without looking",
   "scripts": {
     "start": "node scripts/serve.cjs",
     "check": "node scripts/check.cjs",
     "test": "node --test \"tests/*.test.cjs\"",
     "standalone": "node scripts/standalone.cjs",
-    "play": "node scripts/play-mouse.cjs",
     "contours": "node scripts/build-contours.cjs --check"
   },
   "engines": {

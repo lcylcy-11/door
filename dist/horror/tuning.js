@@ -10,6 +10,7 @@
       slamSpeed: .35, bounce: .02, recoil: .4, flush: .008, unflushDrag: .02, velocityWindow: .1, stillWindow: .25, still: .006,
       handleY: 413, edgeX: 1184, handleX: 1158, travel: 440
     },
+    focus: { openSpeed:.16, quietSpeed:.055, rushCost:5.5, recoveryAfter:.8, recovery:.065, revealAfter:1.8 },
     attention: {
       scrape: 4.2, slam: .3, click: .12, leak: .006, leakFrom: .12, wedge: .05, rattle: .15,
       decay: .006, decayAfter: 3, warn: [.45, .75], checkpointCap: .3
@@ -33,7 +34,7 @@
     eyes: {
       irisFrom: .21, decay: .5, warn: .5,
       c4: { breathLead: 1, fade: .8, grace: 1.5, rate: .7, stay: 6, chordGrip: .5, overstay: 6 },
-      f1: { breathAt: .5, fadeAt: 1.5, fade: .8, grace: .8, rate: .8, withdraw: .8 }
+      f1: { breathAt: 0, fadeAt: .45, fade: .4, grace: .65, rate: 1.1, withdraw: .45 }
     },
     mimic: {
       arrive: 2, bait: .02, baitWindow: 1, baitLarge: .1, delay: .9, palmAt: .6, response: 1.2, copyMax: .04,

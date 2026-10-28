@@ -5,7 +5,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-const { Night, T } = require('./horror-h4-helpers.cjs');
+const Night = require('../dist/horror/night.js');
+const T = Night.T;
 
 const root = path.resolve(__dirname, '..');
 const RULE_FILES = ['dist/horror/night.js', 'dist/horror/tuning.js'];

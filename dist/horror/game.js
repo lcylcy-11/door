@@ -13,7 +13,7 @@
     wide: { front: [0, 0, 1600, 900], down: [470, 319, 1032, 581], rear: [0, 0, 1600, 900], lean: [533, 300, 1067, 600] },
     narrow: { front: [583, 0, 720, 900], down: [752, 319, 464, 581], rear: [322, 0, 720, 900], lean: [910, 300, 480, 600] }
   };
-  let lean = 0, lastRawDt = 0, keyTravel = 0, rmbPrev = false;
+  let lean = 0, lastRawDt = 0, keyTravel = 0, keyFast = false, rmbPrev = false;
   const cam = { front: VIEWS.wide.front, rear: VIEWS.wide.rear, W: 1, H: 1 };
   let audio = null, audioFiles = null, muted = false, assetsReady = false, lastFrame = 0, resultAge = 0, lastState = '', lastBeat = '';
   let gazeMode = 'hold', rmbHeld = false, gazeLatched = false, showNumbers = false;
@@ -87,13 +87,14 @@
     if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault(); if (!night.held && !night.grip()) return;
     const sign = event.key === 'ArrowLeft' ? 1 : -1;
-    if (night.gripping()) night.drag(0, sign * .11 / T.hand.forceGain); else keyTravel += sign * .02;
+    if (night.gripping()) night.drag(0, sign * .11 / T.hand.forceGain); else { keyFast=event.shiftKey; keyTravel += sign * .02; }
   });
 
   // ---- input: bolt ------------------------------------------------------------------------------
   function boltTravel() { return Math.max(96, cam.H * .2); }
   function startBolt(event) {
     if (drag.bolt !== null || !night.grabBolt()) return;
+    if(night.beat==='END')return;
     event.preventDefault(); drag.bolt = event.pointerId; drag.y = event.clientY;
     boltHit.setPointerCapture(event.pointerId); scene.classList.add('latching');
   }
@@ -105,13 +106,7 @@
   const endBolt = event => { if (event.pointerId === drag.bolt) releaseBolt(); };
   boltHit.addEventListener('pointerup', endBolt); boltHit.addEventListener('pointercancel', endBolt);
   boltHit.addEventListener('lostpointercapture', event => { if (event.pointerId === drag.bolt) { drag.bolt = null; night.releaseBolt(); scene.classList.remove('latching'); } });
-  boltHit.addEventListener('keydown', event => {
-    if (!['ArrowUp', 'ArrowDown'].includes(event.key)) return;
-    event.preventDefault(); if (!night.boltHeld && !night.grabBolt()) return;
-    const down = event.key === 'ArrowDown', step = night.b > T.bolt.detent + 1e-6 || (down && night.b >= T.bolt.detent - 1e-6) ? .025 : .05;
-    night.dragBolt(event.key === 'ArrowDown' ? step : -step);
-  });
-  boltHit.addEventListener('keyup', event => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) setTimeout(() => night.releaseBolt(), 60); });
+  boltHit.addEventListener('click',()=>{if(night.beat==='F3')night.grabBolt();});
 
   // ---- input: right button gaze, clicks, keys ------------------------------------------------------
   scene.addEventListener('contextmenu', event => event.preventDefault());
@@ -164,10 +159,7 @@
   function begin(checkpoint) {
     if (!assetsReady) return;
     resetInput(); if (audio) audio.stopAll();
-    // ?cp=C5 starts at a checkpoint for captures and debugging only; it is never PASS evidence.
-    const debugStart = new URLSearchParams(location.search).get('cp');
-    if (checkpoint === 'retry') night.retry(); else night.start(debugStart && !begin.used ? debugStart : 'P0', true);
-    begin.used = true;
+    if (checkpoint === 'retry') night.retry(); else night.start('C1', true);
     initAudio(); lastFrame = performance.now(); caption = null; captionQueue = []; lastLine = ''; resultAge = 0; lastState = ''; lastBeat = ''; keyTravel = 0;
     marks = { floor: -9, glass: -9, palm: -9, pop: -9 };
     $('intro').hidden = true; $('end').hidden = true; $('pauseLayer').hidden = true;
@@ -274,7 +266,6 @@
     rear.style.transform = reduced ? '' : `translateX(${(-(1 - turn) * 55).toFixed(2)}%)`;
     scene.dataset.view = s.turn >= .5 ? 'rear' : s.gaze >= .5 ? 'down' : 'front';
     // Room light changes plates and brightness only.
-    attr($('litPlate'), 'opacity', s.lit);
     $('doorGroup').style.filter = `brightness(${(.85 + .15 * s.lit).toFixed(3)})`;
     attr($('corridorShade'), 'opacity', s.corridorShade);
     attr($('ajarStrip'), 'opacity', s.revealed ? .32 : 0); attr($('stairStrip'), 'opacity', s.revealed ? .5 : 0);
@@ -304,48 +295,13 @@
     attr($('handGrip'), 'opacity', grip ? 1 - retreat : 0);
     attr($('handGrip'), 'x', edgeHand - 48 + retreat * 265 + contact);
     attr($('handGrip'), 'y', 405 + (reduced ? 0 : Math.sin(night.gripTime * 4) * (s.gripStage === 'push' ? 3 : 1)));
-    for (const id of ['hand', 'handGrip', 'fingerArt']) $(id).style.filter = `brightness(${(.8 + .2 * s.lit).toFixed(2)})`;
-    // G6 fingers: grip art clipped to the leading edge; pose shows each mimic state.
-    const fingerOn = s.mimic !== 'none' && !(s.mimic === 'out' && s.fingersOut >= 1);
-    let fx = 0, fy = 0, fo = fingerOn ? 1 : 0;
-    if (s.mimic === 'delay') fy = -3 - (reduced ? 0 : Math.sin(t * 40) * .8);
-    if (s.mimic === 'response') { fx = -6; fy = -5; fo = .78; }
-    if (s.mimic === 'out') { fx = 40 * s.fingersOut; fo = 1 - s.fingersOut; }
-    if (s.P >= T.mimic.pinchWarn) fy = 2;
-    attr($('fingers'), 'opacity', fo);
-    attr($('fingerClipRect'), 'x', edgeHand - 30);
-    attr($('fingerArt'), 'x', edgeHand - 48 + fx); attr($('fingerArt'), 'y', 405 + fy);
-    // G5 slipper: rest on the floor, slides under the leading edge, shows slip pose.
-    const slipper = $('slipper');
-    slipper.style.display = s.prop ? '' : 'none';
-    const rest = [1120, 823, 160, 57.2], wedged = [edge - 22.1, 736.5, 130.1, 46.5];
-    let k = s.wedge === 'in' ? 1 : s.wedge === 'inserting' ? Math.min(1, (t - wedgeAnim.at) / T.wedge.insert) : s.wedge === 'removing' ? 1 - Math.min(1, (t - wedgeAnim.at) / T.wedge.remove) : 0;
-    const popAge = t - marks.pop; if (s.wedge === 'rest' && popAge >= 0 && popAge < .4) k = 1 - popAge / .4;
-    const box = rest.map((v, i) => lerp(v, wedged[i], smooth(k)));
-    const tilt = s.wedge === 'in' ? [0, -3, -8][s.slipLevel] : 0;
-    attr(slipper, 'x', box[0] + tilt); attr(slipper, 'y', box[1] - (s.slipLevel >= 2 ? 3 : 0)); attr(slipper, 'width', box[2]); attr(slipper, 'height', box[3]);
-    slipper.setAttribute('transform', tilt ? `rotate(${tilt} ${box[0] + box[2]} ${box[1] + box[3]})` : '');
-    slipper.style.filter = `brightness(${(.62 + .38 * s.lit).toFixed(2)})`;
-    // Switch rocker and under-door light.
-    attr($('rocker'), 'y', 376.5 + (s.light ? -1.5 : 1.5));
-    $('rocker').style.filter = `brightness(${s.light ? 1.1 : .8})`;
-    $('switch').style.filter = `brightness(${(.7 + .3 * s.lit).toFixed(2)})`;
+    for (const id of ['hand', 'handGrip']) $(id).style.filter = `brightness(${(.8 + .2 * s.lit).toFixed(2)})`;
     attr($('underDoor'), 'opacity', s.lit > .5 && s.o < .02 ? .55 : 0);
     attr($('footGaps'), 'opacity', s.lit > .5 && s.o < .02 && (s.beat === 'F3' || s.beat === 'C7') ? 1 : 0);
     const floorAge = t - marks.floor, glassAge = t - marks.glass;
     attr($('floorKnock'), 'opacity', floorAge >= 0 && floorAge < 1.3 ? .9 * (1 - floorAge / 1.3) : 0);
     attr($('glassKnock'), 'opacity', glassAge >= 0 && glassAge < .9 ? .9 * (1 - glassAge / .9) : 0);
     $('glassKnock').setAttribute('transform', `translate(${(960 - 440 * s.o).toFixed(1)} 330)`);
-    // Rear view: the drawer panel is always composited over the empty cavity.
-    const d = s.d, dy = 44 * d, sc = 1 + .1 * d, cx = 682.9, cy = 335.8;
-    $('drawerFront').setAttribute('transform', `translate(0 ${dy.toFixed(2)}) translate(${cx} ${cy}) scale(${sc.toFixed(3)}) translate(${-cx} ${-cy})`);
-    $('drawerFront').style.filter = `brightness(${(.55 + .15 * s.lit).toFixed(2)})`;
-    $('rearPlate').style.filter = `brightness(${(1 + .25 * s.lit).toFixed(2)})`;
-    const pw = 506.5 * sc, px = cx - pw / 2, ptop = cy + dy - 89.7 * sc / 2;
-    attr($('drawerSideL'), 'points', `429.7,290.9 429.7,383.7 ${px},${ptop + 89.7 * sc} ${px},${ptop}`);
-    attr($('drawerSideR'), 'points', `935.9,290.9 935.9,383.7 ${px + pw},${ptop + 89.7 * sc} ${px + pw},${ptop}`);
-    attr($('drawerSideL'), 'opacity', d); attr($('drawerSideR'), 'opacity', d);
-    attr($('drawerFingers'), 'opacity', Math.max(0, (d - .5) * 2)); attr($('drawerFingers'), 'y', 262 + dy * .6);
     // Screen overlays.
     $('brow').style.opacity = String(smooth(s.gaze));
     $('rearVignette').style.opacity = String(s.turn < .5 && s.drawer === 'open' ? Math.max(0, (s.d - .5) * 2) : 0);
@@ -366,13 +322,13 @@
     boltHit.classList.toggle('cue', boltBeat && !s.boltHeld && (s.beat !== 'F3' || s.b < .79));
     place(switchHit, 382.5, 387.5, 85, 115);
     const switchVisible = !narrowQuery.matches;
-    switchHit.disabled = !(switchVisible && frontUsable && night.switchUnlocked() && !s.gazeDown);
+    switchHit.hidden=true; switchHit.disabled=true;
     switchHit.classList.toggle('cue', s.beat === 'C2' && s.corridor === 'dead' && !s.confirmRoute && !s.light);
     $('switchProxy').hidden = !(narrowQuery.matches && night.state === 'playing' && night.switchUnlocked());
     $('switchProxy').disabled = !s.canSwitch;
     const sl = s.wedge === 'rest' ? [1105, 800, 190, 95] : [edge - 30, 728, 150, 64];
     place(slipperHit, sl[0] + sl[2] / 2, sl[1] + sl[3] / 2, sl[2], sl[3]);
-    slipperHit.disabled = !(frontUsable && s.prop && ['C6b', 'C6c'].includes(s.beat));
+    slipperHit.hidden=true; slipperHit.disabled=true;
     slipperHit.classList.toggle('cue', s.canWedge && ((s.beat === 'C6b' && night.absorbed >= 1 && s.wedge === 'rest') || (s.beat === 'C6c' && !s.shoves && s.wedge === 'in')));
     // Turn control and gaze toggle.
     const turnBtn = $('turn');
@@ -382,15 +338,15 @@
     turnBtn.setAttribute('aria-label', s.wantRear ? '문 쪽으로 돌아서기' : '뒤돌아보기');
     turnBtn.classList.toggle('cue', (s.drawer === 'open' && !s.wantRear) || (s.drawer === 'shut' && s.wantRear));
     const gazeBtn = $('gazeToggle');
-    gazeBtn.hidden = !(night.state === 'playing' && s.turn === 0 && !s.wantRear && (gazeMode === 'toggle' || ['C4', 'C5', 'C6a', 'C6b', 'C6c', 'C7', 'F1', 'F2', 'F3'].includes(s.beat)));
+    gazeBtn.hidden = !(night.state === 'playing' && s.turn === 0 && !s.wantRear && s.beat==='C4');
     gazeBtn.setAttribute('aria-pressed', String(gazeLatched));
     $('gazeBadge').hidden = !s.gazeDown;
     $('leakChip').hidden = !(night.state === 'playing' && s.leak);
     // HUD: at most two panels (force > checklist > sound).
     const forceOn = night.active() && s.hand && s.handStage !== 'released';
-    const checkOn = night.active() && s.beat === 'F3';
+    const checkOn = false;
     // The force panel and the checklist never coexist, so at most two panels show.
-    const soundWanted = night.active() && (s.sources.length > 0 || s.band === 'stiff' || s.A >= .25) && s.turn < .5;
+    const soundWanted = night.active()&&!forceOn&&['C1','C4'].includes(s.beat)&&(s.sources.length>0||s.band==='stiff'||s.A>=.25);
     $('forcePanel').hidden = !forceOn; $('checklist').hidden = !checkOn; $('soundStrip').hidden = !soundWanted; scene.classList.toggle('strip', soundWanted);
     if (forceOn) {
       const easing = s.gripStage === 'ease';
@@ -413,7 +369,7 @@
       $('soundLabel').textContent = s.A >= .25 ? '바깥 소리 · 기척' : '바깥 소리';
     }
     $('numbers').hidden = !(showNumbers && night.state !== 'ready');
-    if (showNumbers) $('numbers').textContent = `beat ${s.beat}  o ${s.o.toFixed(3)}  b ${s.b.toFixed(2)}\n기척 A ${s.A.toFixed(2)}  가림 L ${s.L.toFixed(2)}${s.covered ? ' ●' : ''}\n시선 E ${s.E.toFixed(2)}  끼임 P ${s.P.toFixed(3)}\n서랍 d ${s.d.toFixed(2)}  슬리퍼 ${s.slip.toFixed(1)}  힘 ${s.force.toFixed(2)}`;
+    if (showNumbers) $('numbers').textContent = `beat ${s.beat}  o ${s.o.toFixed(3)}  b ${s.b.toFixed(2)}\n기척 A ${s.A.toFixed(2)}  가림 L ${s.L.toFixed(2)}${s.covered ? ' ●' : ''}\n시선 E ${s.E.toFixed(2)}  힘 ${s.force.toFixed(2)}`;
     // QA surface (read-only).
     Object.assign(scene.dataset, { beat: s.beat, gaze: s.gazeDown ? 'down' : 'front', cover: s.covered ? 'on' : 'off', mimic: s.mimic, wedge: s.wedge,
       latch: s.seatedFlag ? 'seated' : s.b > .02 ? 'part' : 'up', light: s.light ? 'on' : 'off', hand: s.hand ? s.handStage : 'none', grip: s.gripStage });
@@ -437,7 +393,7 @@
     let hintText = '', hx = 0, hy = 0;
     if (frontUsable && s.beat === 'P0' && !s.boltHeld) { hintText = '누른 채 ↑'; const p = toStage(1164.95, 700); hx = p.x; hy = p.y + 8; }
     else if (frontUsable && s.beat === 'C1' && !s.held && s.o < .02) { hintText = '누른 채 ← 열기'; const p = toStage(T.door.handleX - 440 * s.o, 500); hx = p.x; hy = p.y; }
-    else if (frontUsable && boltBeat && s.beat !== 'P0' && !s.boltHeld && !s.held && !s.seatedFlag) { hintText = '걸쇠 ↓'; const p = toStage(1164.95 - 440 * s.o, 700); hx = p.x; hy = p.y + 8; }
+    else if (frontUsable && boltBeat && s.beat !== 'P0' && !s.boltHeld && !s.held && !s.seatedFlag) { hintText = '한 번 눌러 잠그기'; const p = toStage(1164.95 - 440 * s.o, 700); hx = p.x; hy = p.y + 8; }
     hint.hidden = !hintText; if (hintText) { hint.textContent = hintText; hint.style.left = `${hx}px`; hint.style.top = `${hy}px`; }
     // Result screen after the loss tail.
     if (night.state !== lastState) { lastState = night.state; resultAge = 0; if (['won', 'lost'].includes(night.state)) { resetInput(); $('pause').disabled = true; } }
@@ -457,7 +413,7 @@
       (night.beat === 'P0' || (night.beat === 'F3' && !night.seatedFlag) || (night.beat === 'C7' && night.boltHeld));
     lean = reduced ? (leanWanted ? 1 : 0) : Math.max(0, Math.min(1, lean + (leanWanted ? 1 : -1) * dt / .45));
     if (night.active()) gazeInput();
-    if (keyTravel && night.held && !night.gripping()) { const chunk = Math.sign(keyTravel) * Math.min(Math.abs(keyTravel), night.cap() * dt); night.drag(chunk, 0); keyTravel -= chunk; if (Math.abs(keyTravel) < 1e-6) keyTravel = 0; }
+    if (keyTravel && night.held && !night.gripping()) { const cap=keyFast?night.cap():Math.min(night.cap(),T.focus.quietSpeed); const chunk = Math.sign(keyTravel) * Math.min(Math.abs(keyTravel), cap * dt); night.drag(chunk, 0); keyTravel -= chunk; if (Math.abs(keyTravel) < 1e-6) keyTravel = 0; }
     else if (!night.held) keyTravel = 0;
     const events = night.events.splice(0);
     handleEvents(events);
@@ -466,11 +422,10 @@
   }
 
   // ---- loading ------------------------------------------------------------------------------------------
-  const IMAGES = ['apartment.png', 'door.png', 'hand.png', 'hand-grip.png', 'front-lit.webp', 'eyes.webp', 'latch-body.webp', 'latch-bolt.webp',
-    'switch-body.webp', 'switch-rocker.webp', 'slipper-wedge.webp', 'rear-room.webp', 'rear-drawer-front.webp'];
+  const IMAGES=['apartment.png','door.png','hand.png','hand-grip.png','eyes.webp','latch-body.webp','latch-bolt.webp'];
   audioFiles = window.RoomSound.prefetch();
   Promise.all(IMAGES.map(src => new Promise((resolve, reject) => { const img = new Image(); img.onload = resolve; img.onerror = reject; img.src = `./assets/${src}`; })))
-    .then(() => { assetsReady = true; $('start').disabled = false; $('loadStatus').textContent = '왼쪽·오른쪽 버튼 · 약 4–8분 · Esc 일시정지'; })
+    .then(() => { assetsReady = true; $('start').disabled = false; $('loadStatus').textContent = '열기 · 버티기 · 보지 않고 닫기 · Esc 일시정지'; })
     .catch(() => { $('loadStatus').textContent = '그림을 불러오지 못했습니다. 페이지를 새로고침해 주세요.'; });
   // Read-only QA surface: a frozen snapshot and the audio graph's actual values. No setters.
   Object.defineProperty(window, 'doorH4', { value: Object.freeze({ snapshot: () => night.snapshot(), audioProbe: () => audio ? { ...audio.probe(), lastRawDt, sinceFrame: (performance.now() - lastFrame) / 1000 } : null, soundState: () => night.soundState() }) });

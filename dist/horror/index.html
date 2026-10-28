@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="문 하나, 그 너머의 손과 눈, 등 뒤의 서랍. 마우스로 플레이하는 2D 1인칭 공포 시안.">
+  <meta name="description" content="문을 열고, 붙잡는 손에 버티고, 눈을 피하며 닫는 짧은 1인칭 공포 게임.">
   <title>문 좀 살살 — 문틈</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="preload" as="image" href="./assets/apartment.png">
@@ -14,7 +14,7 @@
 <main class="game-page">
   <header class="topbar">
     <a class="wordmark" href="./">문 좀 살살<span>문틈</span></a>
-    <p class="objective" id="objective">걸쇠를 풀고, 문 너머를 확인하세요.</p>
+    <p class="objective" id="objective">문 너머를 확인하세요.</p>
     <nav aria-label="게임 제어">
       <button id="sound" aria-pressed="true" aria-keyshortcuts="M">소리 켜짐</button>
       <button id="pause" disabled aria-keyshortcuts="Escape">일시정지</button>
@@ -37,7 +37,6 @@
           <linearGradient id="ajarLight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9cfc7" stop-opacity=".2"/><stop offset=".6" stop-color="#b9cfc7" stop-opacity=".7"/><stop offset="1" stop-color="#b9cfc7" stop-opacity=".9"/></linearGradient>
         </defs>
         <image class="plate" href="./assets/apartment.png" x="0" y="0" width="1600" height="900" preserveAspectRatio="none"/>
-        <image id="litPlate" class="plate" href="./assets/front-lit.webp" x="0" y="0" width="1600" height="900" preserveAspectRatio="none" opacity="0"/>
         <g clip-path="url(#opening)">
           <rect id="corridorShade" x="700" y="80" width="488" height="695" fill="#03100f" opacity=".08"/>
           <rect id="ajarStrip" x="996" y="239" width="6" height="316" fill="url(#ajarLight)" opacity="0" filter="url(#blur3)"/>
@@ -62,31 +61,17 @@
           </g>
           <image id="hand" href="./assets/hand.png" x="1000" y="490" width="380" height="253" opacity="0"/>
           <image id="handGrip" href="./assets/hand-grip.png" x="930" y="405" width="420" height="280" opacity="0"/>
-          <g id="fingers" clip-path="url(#fingerClip)" opacity="0"><image id="fingerArt" href="./assets/hand-grip.png" x="1136" y="405" width="420" height="280"/></g>
         </g>
         <rect id="scuff" x="1008" y="776" width="114" height="8" fill="#b9a786" opacity=".12"/>
         <rect id="underDoor" x="700" y="771" width="488" height="5" fill="#f0c27a" opacity="0"/>
         <g id="footGaps" opacity="0"><rect x="1040" y="770" width="28" height="7" fill="#050404"/><rect x="1092" y="770" width="28" height="7" fill="#050404"/></g>
         <ellipse id="floorHole" cx="1150" cy="779" rx="7" ry="2.5" fill="#060403" opacity=".15"/>
-        <g id="switch">
-          <image href="./assets/switch-body.webp" x="368" y="361" width="27.3" height="53" preserveAspectRatio="none"/>
-          <image id="rocker" href="./assets/switch-rocker.webp" x="377.2" y="376.5" width="8.7" height="21.5" preserveAspectRatio="none"/>
-        </g>
-        <image id="slipper" href="./assets/slipper-wedge.webp" x="1120" y="823" width="160" height="57.2" preserveAspectRatio="none"/>
         <g class="knock-mark" id="floorKnock" opacity="0"><path d="M760 790l-8 16m43-12v22m34-27 8 17"/><text x="795" y="850" text-anchor="middle">쿵. 쿵. 쿵.</text></g>
         <g class="knock-mark" id="glassKnock" opacity="0"><path d="M0 0l-10-12m22 2v-16m20 14 10-12"/></g>
       </svg>
-      <svg id="rear" class="view-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs><clipPath id="cavityClip"><rect x="420" y="250" width="526" height="200"/></clipPath></defs>
-        <image class="plate" id="rearPlate" href="./assets/rear-room.webp" x="0" y="0" width="1600" height="900" preserveAspectRatio="none"/>
-        <rect id="drawerInterior" x="429.7" y="290.9" width="506.2" height="92.8" fill="#050403"/>
-        <g clip-path="url(#cavityClip)"><image id="drawerFingers" href="./assets/hand.png" x="640" y="262" width="123" height="82" opacity="0"/></g>
-        <polygon id="drawerSideL" points="429.7,290.9 429.7,383.7 429.7,383.7 429.7,290.9" fill="#1a110b" opacity="0"/>
-        <polygon id="drawerSideR" points="935.9,290.9 935.9,383.7 935.9,383.7 935.9,290.9" fill="#1a110b" opacity="0"/>
-        <image id="drawerFront" href="./assets/rear-drawer-front.webp" x="429.7" y="290.9" width="506.5" height="89.7" preserveAspectRatio="none"/>
-      </svg>
+      <svg id="rear" class="view-svg" viewBox="0 0 1600 900" aria-hidden="true"></svg>
       <button id="handle" class="hotspot handle" aria-label="문손잡이. 누른 채 좌우로 끌기. 손이 붙잡으면 → 힘 싣기, ← 힘 빼기" aria-keyshortcuts="Enter ArrowLeft ArrowRight Space" disabled><span class="ring" aria-hidden="true"></span><span class="now" id="nowTag" aria-hidden="true">지금 ▶</span></button>
-      <button id="boltHit" class="hotspot prop" aria-label="걸쇠 손잡이. 누른 채 위아래로 천천히" aria-keyshortcuts="ArrowUp ArrowDown" disabled><span class="ring" aria-hidden="true"></span></button>
+      <button id="boltHit" class="hotspot prop" aria-label="걸쇠 잠그기. 한 번 눌러 잠금" aria-keyshortcuts="ArrowUp ArrowDown" disabled><span class="ring" aria-hidden="true"></span></button>
       <button id="switchHit" class="hotspot prop" aria-label="벽 스위치. 방 불 켜기/끄기" aria-keyshortcuts="L" disabled></button>
       <button id="slipperHit" class="hotspot prop" aria-label="슬리퍼. 문 밑에 끼우기/빼기" aria-keyshortcuts="W" disabled></button>
     </div>
@@ -106,7 +91,7 @@
       <p><span id="soundLabel">바깥 소리</span><b id="coverChip">조용</b></p>
       <div class="track" aria-hidden="true"><span class="tick"></span><span class="fill" id="maskFill"></span></div>
       <div class="track attention" id="attentionTrack" aria-hidden="true" hidden><span class="fill" id="attentionFill"></span><span class="warn" style="left:45%"></span><span class="warn" style="left:75%"></span></div>
-      <p class="note" id="soundNote">소리만 덮는다 — 눈·손은 못 속인다</p>
+      <p class="note" id="soundNote">천천히는 언제든 가능 · 소리가 덮이면 빠르게</p>
     </div>
     <div class="hud force" id="forcePanel" hidden>
       <p id="forceCue">손가락이 굳는다 — 밀 준비</p>
@@ -125,7 +110,7 @@
         <ul class="note-rules">
           <li><b>왼쪽 버튼</b> — 손잡이를 누른 채 끌기. 손이 붙잡으면 → 버티고, ← 힘 빼기.</li>
           <li><b>오른쪽 버튼</b>을 누르고 있으면 시선이 내려갑니다.</li>
-          <li>소리가 나는 일은 <b>바깥 소리가 덮을 때</b>만.</li>
+          <li>문이 울면 <b>천천히</b>. 바깥 소리가 나면 조금 빨라도 괜찮아요.</li>
         </ul>
         <label class="setting"><input type="checkbox" id="gazeModeIntro"> 시선 내리기를 <b>눌러서 전환</b>으로 (트랙패드)</label>
         <button class="primary" id="start" disabled>문 앞에 서기 <span aria-hidden="true">→</span></button>
@@ -146,9 +131,9 @@
   </section>
   <footer class="bottom-bar">
     <div class="subtitle-wrap"><span class="sound-location" id="location">방 안</span><p id="subtitle" role="status" aria-live="polite">02:17.</p></div>
-    <p id="instruction" class="instruction">마우스로 걸쇠와 손잡이를 끌어 조작합니다 · Esc 일시정지</p>
+    <p id="instruction" class="instruction">손잡이를 누른 채 ← 열기 · → 닫기 · Esc 일시정지</p>
   </footer>
-  <p class="prototype-note">한 장면의 공포 시안 · 약 4–8분 · 소리를 꺼도 모든 신호가 화면에 표시됩니다. 수치와 조작은 검토 전 임시값입니다. <a href="../2d/">이전 시안</a></p>
+  <p class="prototype-note">열기 · 버티기 · 보지 않고 닫기. 소리를 꺼도 모든 신호가 화면에 표시됩니다. <a href="../2d/">이전 시안</a></p>
 </main>
 <script src="./tuning.js"></script><script src="./contours.js"></script><script src="./night.js"></script><script src="./captions.js"></script><script src="./sound.js"></script><script src="./game.js"></script>
 </body>

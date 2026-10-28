@@ -1,5 +1,16 @@
 # Current state
 
+## Current direction — focus cut (2026-10-28)
+
+- Canonical branch: `main`. User explicitly requested merging `codex/first-person-horror` into main; merged and remote-verified at `9914a6e` before this edit.
+- Writer now: none — Codex completed the focus cut; human fun/feel review remains open.
+- Active flow: C1 slow opening with optional noise cover → C2 short blackout → C3 one H2 hand fight → C4 blind closing → F3 one-click lock → END.
+- Removed from play: mimic repetition, switch choice, drawer/wedge chores, latch detent/rhythm, forced reopening and duplicate hand/eye rounds.
+- Validation: 36 Node tests; 23 JavaScript files syntax-checked; real browser opening/drag, hand failure/retry, keyboard resistance, gaze toggle, closing and one-click lock reached the visible winning ending. The first automation wait ended before a target transition; the subsequent checkpoint retry cleared the retained sequence. A fresh uninterrupted physical-mouse round and subjective fun remain unverified.
+- Delivery: source changes target `main`; local preview is `http://127.0.0.1:5173/horror/`. No deployment. The H4 notes below are historical, not the current feature contract. Latest user direction supersedes the old instruction to include all seven gimmicks.
+
+## Historical H4 checkpoint
+
 - Writer now: none — Codex released after recording the GitHub push verification (2026-10-28).
 - GitHub push: PASS — user requested commit/push; `git push -u origin codex/first-person-horror` succeeded (`Everything up-to-date`), and `git ls-remote` confirmed the implementation head `3073208ee702c835b31b2e2f00f5c3d848092bee`. The working branch already contained the asset and H4 commits on GitHub. This tracker-only receipt follows that head; no merge into `main` was requested. Untracked `.claude/` remains local.
 - Current checkpoint H4: PASS for AI implementation and verification — feature commit `7ac427e` on `codex/first-person-horror` (from `ea3072b`); all seven gimmicks integrated into a rebuilt one-door night; human fear/feel review pending (not accepted, not released).
