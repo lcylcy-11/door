@@ -2,6 +2,9 @@
 
 ## Current direction — focus cut (2026-10-28)
 
+- Latest UI direction: only the game scene and contextual meter. Removed all added chrome, clock, labels, captions, hints, tutorial, settings and menu/result cards. Auto-start after assets load; finished-scene click/Enter retries (win restarts). Esc pause and existing mouse/keyboard controls remain. Meter follows the held pointer with edge clamping; released/keyboard input anchors it beside the handle.
+- UI verification: syntax check and 36 existing tests pass; real browser verified direct start, no visible text, Esc pause/resume, opening, hand failure and menu-free retry. Evidence: `outputs/문틈_UI제거_게이지만.png` in the task output directory.
+
 - Canonical branch: `main`. User explicitly requested merging `codex/first-person-horror` into main; merged and remote-verified at `9914a6e` before this edit.
 - Writer now: none — Codex completed the focus cut; human fun/feel review remains open.
 - Active flow: C1 slow opening with optional noise cover → C2 short blackout → C3 one H2 hand fight → C4 blind closing → F3 one-click lock → END.

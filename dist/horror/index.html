@@ -12,16 +12,7 @@
 </head>
 <body>
 <main class="game-page">
-  <header class="topbar">
-    <a class="wordmark" href="./">문 좀 살살<span>문틈</span></a>
-    <p class="objective" id="objective">문 너머를 확인하세요.</p>
-    <nav aria-label="게임 제어">
-      <button id="sound" aria-pressed="true" aria-keyshortcuts="M">소리 켜짐</button>
-      <button id="pause" disabled aria-keyshortcuts="Escape">일시정지</button>
-      <button id="restart" disabled>처음부터</button>
-    </nav>
-  </header>
-  <section class="scene" id="scene" aria-label="중문을 바라보는 1인칭 화면" data-view="front">
+  <section class="scene" id="scene" tabindex="0" aria-label="중문을 바라보는 1인칭 화면" data-view="front">
     <div class="stage" id="stage">
       <svg id="front" class="view-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
@@ -66,74 +57,25 @@
         <rect id="underDoor" x="700" y="771" width="488" height="5" fill="#f0c27a" opacity="0"/>
         <g id="footGaps" opacity="0"><rect x="1040" y="770" width="28" height="7" fill="#050404"/><rect x="1092" y="770" width="28" height="7" fill="#050404"/></g>
         <ellipse id="floorHole" cx="1150" cy="779" rx="7" ry="2.5" fill="#060403" opacity=".15"/>
-        <g class="knock-mark" id="floorKnock" opacity="0"><path d="M760 790l-8 16m43-12v22m34-27 8 17"/><text x="795" y="850" text-anchor="middle">쿵. 쿵. 쿵.</text></g>
+        <g class="knock-mark" id="floorKnock" opacity="0"><path d="M760 790l-8 16m43-12v22m34-27 8 17"/></g>
         <g class="knock-mark" id="glassKnock" opacity="0"><path d="M0 0l-10-12m22 2v-16m20 14 10-12"/></g>
       </svg>
       <svg id="rear" class="view-svg" viewBox="0 0 1600 900" aria-hidden="true"></svg>
-      <button id="handle" class="hotspot handle" aria-label="문손잡이. 누른 채 좌우로 끌기. 손이 붙잡으면 → 힘 싣기, ← 힘 빼기" aria-keyshortcuts="Enter ArrowLeft ArrowRight Space" disabled><span class="ring" aria-hidden="true"></span><span class="now" id="nowTag" aria-hidden="true">지금 ▶</span></button>
-      <button id="boltHit" class="hotspot prop" aria-label="걸쇠 잠그기. 한 번 눌러 잠금" aria-keyshortcuts="ArrowUp ArrowDown" disabled><span class="ring" aria-hidden="true"></span></button>
-      <button id="switchHit" class="hotspot prop" aria-label="벽 스위치. 방 불 켜기/끄기" aria-keyshortcuts="L" disabled></button>
-      <button id="slipperHit" class="hotspot prop" aria-label="슬리퍼. 문 밑에 끼우기/빼기" aria-keyshortcuts="W" disabled></button>
+      <button id="handle" class="hotspot handle" aria-label="문손잡이. 누른 채 좌우로 끌기. 손이 붙잡으면 → 힘 싣기, ← 힘 빼기" aria-keyshortcuts="Enter ArrowLeft ArrowRight Space" disabled></button>
+      <button id="boltHit" class="hotspot prop" aria-label="걸쇠 잠그기. 한 번 눌러 잠금" aria-keyshortcuts="ArrowUp ArrowDown" disabled></button>
     </div>
     <div class="brow" id="brow" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
     <div class="rear-vignette" id="rearVignette" aria-hidden="true"></div>
     <div class="fade" id="fade" aria-hidden="true"></div>
-    <div class="timepiece" aria-label="시각">02<span>:</span>17</div>
-    <div class="room-caption" id="roomCaption" aria-hidden="true">침실 쪽 · 중문</div>
-    <span class="hint" id="hint" hidden></span>
-    <button id="turn" class="edge turn" aria-keyshortcuts="Q" hidden><span class="arrow" aria-hidden="true">↶</span><span id="turnLabel">뒤</span></button>
-    <button id="switchProxy" class="edge switch-proxy" aria-label="벽 스위치" aria-keyshortcuts="L" hidden><img src="./assets/switch-rocker.webp" alt=""><span>불</span></button>
-    <button id="gazeToggle" class="gaze-toggle" aria-pressed="false" aria-keyshortcuts="S" hidden>시선 ↓</button>
-    <span class="badge" id="gazeBadge" hidden>시선 아래</span>
-    <span class="badge leak" id="leakChip" hidden>빛이 샌다</span>
-    <div class="hud sound-strip" id="soundStrip" hidden>
-      <p><span id="soundLabel">바깥 소리</span><b id="coverChip">조용</b></p>
+    <div class="hud sound-strip" id="soundStrip" role="meter" aria-label="바깥 소리" aria-valuemin="0" aria-valuemax="100" hidden>
       <div class="track" aria-hidden="true"><span class="tick"></span><span class="fill" id="maskFill"></span></div>
       <div class="track attention" id="attentionTrack" aria-hidden="true" hidden><span class="fill" id="attentionFill"></span><span class="warn" style="left:45%"></span><span class="warn" style="left:75%"></span></div>
-      <p class="note" id="soundNote">천천히는 언제든 가능 · 소리가 덮이면 빠르게</p>
     </div>
-    <div class="hud force" id="forcePanel" hidden>
-      <p id="forceCue">손가락이 굳는다 — 밀 준비</p>
+    <div class="hud force" id="forcePanel" role="meter" aria-label="버티는 힘" aria-valuemin="0" aria-valuemax="100" hidden>
       <div class="track" aria-hidden="true"><span id="forceBand" class="band"></span><span id="forceFill" class="fill"></span></div>
-      <p class="controls">누른 채 ← 힘 빼기 <span>힘 싣기 →</span></p>
     </div>
-    <div class="hud checklist" id="checklist" hidden>
-      <ul><li id="ckClosed">문 닫힘</li><li id="ckWedge">슬리퍼 없음</li><li id="ckHands">손잡이 놓음</li><li id="ckNoHand">문 너머 손 없음</li></ul>
-      <div class="dots" id="dots" aria-hidden="true"><span></span><span></span><span></span></div>
-    </div>
-    <pre class="numbers" id="numbers" hidden></pre>
-    <div class="intro" id="intro">
-      <div class="paper">
-        <h1>문 좀 살살.</h1>
-        <p class="note-lead">아랫집이 예민합니다.<br>밤에는 문을 조심히 여닫아 주세요.</p>
-        <ul class="note-rules">
-          <li><b>왼쪽 버튼</b> — 손잡이를 누른 채 끌기. 손이 붙잡으면 → 버티고, ← 힘 빼기.</li>
-          <li><b>오른쪽 버튼</b>을 누르고 있으면 시선이 내려갑니다.</li>
-          <li>문이 울면 <b>천천히</b>. 바깥 소리가 나면 조금 빨라도 괜찮아요.</li>
-        </ul>
-        <label class="setting"><input type="checkbox" id="gazeModeIntro"> 시선 내리기를 <b>눌러서 전환</b>으로 (트랙패드)</label>
-        <button class="primary" id="start" disabled>문 앞에 서기 <span aria-hidden="true">→</span></button>
-        <small id="loadStatus">방 안을 준비하고 있어요.</small>
-      </div>
-    </div>
-    <div id="end" class="end" hidden role="dialog" aria-modal="true" aria-labelledby="endTitle">
-      <div class="end-content"><h2 id="endTitle"></h2><p id="endCopy"></p><p class="end-hint" id="endHint" hidden></p>
-        <div class="end-actions"><button id="retry" class="primary">이 장면부터 다시 <span aria-hidden="true">→</span></button><button id="again" class="secondary">처음부터</button></div></div>
-    </div>
-    <div id="pauseLayer" class="pause-layer" hidden role="dialog" aria-modal="true" aria-labelledby="pauseTitle"><div>
-      <h2 id="pauseTitle">잠깐, 숨 고르기.</h2><p>문밖의 시간도 멈췄습니다.</p>
-      <div class="settings">
-        <label class="setting"><input type="checkbox" id="gazeMode"> 시선 내리기: 눌러서 전환 (끄면 누르는 동안)</label>
-        <label class="setting"><input type="checkbox" id="showNumbers"> 숫자 표시 (기척·가림·시선 수치)</label>
-      </div>
-      <button id="resume" class="primary">이어서 하기</button></div></div>
   </section>
-  <footer class="bottom-bar">
-    <div class="subtitle-wrap"><span class="sound-location" id="location">방 안</span><p id="subtitle" role="status" aria-live="polite">02:17.</p></div>
-    <p id="instruction" class="instruction">손잡이를 누른 채 ← 열기 · → 닫기 · Esc 일시정지</p>
-  </footer>
-  <p class="prototype-note">열기 · 버티기 · 보지 않고 닫기. 소리를 꺼도 모든 신호가 화면에 표시됩니다. <a href="../2d/">이전 시안</a></p>
 </main>
 <script src="./tuning.js"></script><script src="./contours.js"></script><script src="./night.js"></script><script src="./captions.js"></script><script src="./sound.js"></script><script src="./game.js"></script>
 </body>
