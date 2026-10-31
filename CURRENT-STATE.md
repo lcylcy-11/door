@@ -1,5 +1,17 @@
 # Current state
 
+## Current direction — SVG corridor loop (finalized 2026-10-31)
+
+- Canonical branch: main. Writer: none — Codex finalized the ten-room route and photo-story direction for GitHub push.
+- Current contract: PRODUCT.md. Active source: loop.js / loop-art.js / loop-game.js / loop-props.js / loop.css.
+- Ten rooms: left, right, key, silhouette, combination, peephole, hinge, lockpick, ambush, golf. Recoverable fishing duel, persistent inventory, three optional photo pages, metaphor-only environment.
+- Art is entirely SVG; pre-existing untracked loop PNG concepts are unused and preserved locally. No image generation or deployment for this revision.
+- Validation: 57/57 tests pass (21 current loop cases); syntax check passes for 28 JS/CJS files. The model completes all ten rooms at 30/60/120 fps. Browser input verified left/right slides, key, note/dials, patrol timing, held peephole inspection, hinge extraction, lockpick/torque, ambush closure/reopening, club pickup and first impact. Final damage-layer thresholds fixed; no new full physical-mouse winning run is claimed.
+- Final polish: each golf strike reveals exactly one damage stage, and pixel chips accompany impacts; panel entry releases residual door input. Three ordinary-life photos (party, furniture move, indoor golf) have fragmentary reverse sides.
+- Historical focus-cut notes below do not describe the current active game.
+
+## Historical implementation notes
+
 ## Current direction — focus cut (2026-10-28)
 
 - Latest UI direction: only the game scene and contextual meter. Removed all added chrome, clock, labels, captions, hints, tutorial, settings and menu/result cards. Auto-start after assets load; finished-scene click/Enter retries (win restarts). Esc pause and existing mouse/keyboard controls remain. Meter follows the held pointer with edge clamping; released/keyboard input anchors it beside the handle.

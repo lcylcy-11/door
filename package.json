@@ -1,8 +1,8 @@
 {
   "name": "quiet-door",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
-  "description": "A focused one-door horror game: open quietly, resist one hand, close without looking",
+  "description": "A text-free 2D looping-room horror game: observe each door and open it according to its anomaly",
   "scripts": {
     "start": "node scripts/serve.cjs",
     "check": "node scripts/check.cjs",
